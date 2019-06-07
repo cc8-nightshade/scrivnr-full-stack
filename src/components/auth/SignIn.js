@@ -9,6 +9,7 @@ export class SignIn extends Component {
       <div className="container">
         <form onSubmit={} className="white">
           <h5 className="grey-text text-darken-3">Log in</h5>
+          <div className="input-field"></div>
         </form>
       </div>
     )
