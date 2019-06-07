@@ -16,12 +16,12 @@ class App extends Component {
         <div className="App">
           <Navbar></Navbar>
           {/* <Dashboard></Dashboard> */}
-          <Video></Video>
-          {/* <Switch> */}
+          {/* <Video></Video> */}
+          <Switch>
             {/* <Route path='/about' component={Dashboard}></Route> */}
             {/* <Route path='/contact/:id' component={ContactDetails}></Route> */}
-            {/* <Route path='/' component={Video}></Route> */}
-          {/* </Switch> */}
+            <Route path='/' component={Video}></Route>
+          </Switch>
         </div>
       </BrowserRouter>
     );

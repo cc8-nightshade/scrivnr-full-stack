@@ -2,12 +2,12 @@ const express = require("express");
 const socket = require("socket.io");
 const morgan = require("morgan");
 const PORT = process.env.PORT || 9000;
-const fs = require("fs");
-var https = require('https');
+// const fs = require("fs");
+// var https = require('https');
 
-var privateKey = fs.readFileSync('./server/ssl/server.key');
-var certificate = fs.readFileSync('./server/ssl/server.cert');
-var credentials = {key: privateKey, cert: certificate};
+// var privateKey = fs.readFileSync('./server/ssl/server.key');
+// var certificate = fs.readFileSync('./server/ssl/server.cert');
+// var credentials = {key: privateKey, cert: certificate};
 
 //var app = express.createServer(credentials);
 
@@ -24,17 +24,18 @@ app.use(express.static('build'));
 
 
 console.log("Starting express...");
-// const server = app.listen(PORT, () => {
-//   console.log(`App listening on port ${PORT}!`);
-// });
+// console.log('Please visit: https://localhost:9000/')
+const server = app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}!`);
+});
 // Setup logger
 
 // HTTPS
-var httpsServer = https.createServer(credentials, app);
+// var httpsServer = https.createServer(credentials, app);
 
-httpsServer.listen(9000);
+// httpsServer.listen(9000);
 
-let io = socket(httpsServer);
+let io = socket(server);
 
 let connectedUsers = [];
 
