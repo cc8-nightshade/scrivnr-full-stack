@@ -6,7 +6,7 @@ import SignedInLinks from './SignedInLinks'
 const Navbar = () => {
   return (
     <nav className="nav-wrapper teal darken-3 z-depth-0">
-      <Link to='/about'className="brand-logo">Scrivnr</Link>
+      <Link to='/'className="brand-logo">Scrivnr</Link>
       {/* <div className="container"> */}
         {/* <Link to='/' className="brand-logo">Scrivnr</Link> */}
         <SignedInLinks></SignedInLinks>
