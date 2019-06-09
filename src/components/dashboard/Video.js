@@ -31,7 +31,6 @@ export default class Video extends Component {
       alert(messageData);
     });
     tempSocket.on("video-offer", (videoOfferData) => {
-      document.getElementById("testing").innerHTML = videoOfferData;
       console.log("receiving video offer", videoOfferData);
       if (this.state.myPeerConnection === undefined) {
         console.log("handling video offer", videoOfferData);
@@ -75,14 +74,19 @@ export default class Video extends Component {
   }
   
   
-  createPeerConnection = () => {
-    this.state.myPeerConnection = new RTCPeerConnection({
+  createPeerConnection = async () => {
+    // this.state.myPeerConnection 
+    let newPeerConnection = await new RTCPeerConnection({
         iceServers: [     // Information about ICE servers - Use your own!
           {
             urls: "stun:stun.l.google.com:19302"
           }
         ]
     });
+
+    await this.setState({
+      myPeerConnection: newPeerConnection
+    })
   
     this.state.myPeerConnection.onicecandidate = this.handleICECandidateEvent;
     this.state.myPeerConnection.ontrack = this.handleTrackEvent;
@@ -118,8 +122,11 @@ export default class Video extends Component {
     // document.getElementById("hangup-button").disabled = false;
   }
   
-  handleVideoOfferMessage = (videoOfferData) => {
-    this.createPeerConnection();
+  handleVideoOfferMessage = async (videoOfferData) => {
+    let newConnection = this.createPeerConnection();
+    await this.setState({
+      myPeerConnection: newConnection
+    })
     let offerDescription = new RTCSessionDescription(videoOfferData.sdp);
     console.log("session description receiving", offerDescription);
     this.state.myPeerConnection.setRemoteDescription(offerDescription)
