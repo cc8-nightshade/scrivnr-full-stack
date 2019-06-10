@@ -25,7 +25,7 @@ export default class Video extends Component {
     // alert("tesitng123");
     // this.state.mySocket = io.connect('https://192.168.10.81:9000/');
     const tempSocket = io.connect();
-    // 'localhost:9000'
+    
     // this.setState({
     //   mySocket: tempSocket
     // })

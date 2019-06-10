@@ -2,7 +2,7 @@ import firebase from 'firebase/app'
 import 'firebase/firestore'
 import 'firebase/auth'
 
-require('dotenv').config()
+// require('dotenv').config()
       // Your web app's Firebase configuration
 var fbConfig = {
   apiKey:'AIzaSyBkO2Id9fChJLJEIoDncFQIZkveN1p4O6M',
