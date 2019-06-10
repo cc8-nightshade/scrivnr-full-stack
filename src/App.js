@@ -1,26 +1,27 @@
-import React, { Component } from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import Navbar from './components/layout/Navbar'
-import Dashboard from './components/dashboard/Dashboard'
-// import ContactList from './components/contacts/ContactList'
-import ContactDetails from './components/contacts/ContactDetails'
-import Video from './components/dashboard/Video'
-import './App.css'
-
-
+import React, { Component } from "react";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import Navbar from "./components/layout/Navbar";
+import Dashboard from "./components/dashboard/Dashboard";
+import ContactList from "./components/contacts/ContactList";
+import Video from "./components/dashboard/Video";
+import SignIn from "./components/auth/SignIn";
+import SignUp from "./components/auth/SignUp";
+import Transcripts from "./components/dashboard/Transcripts";
+import "./App.css";
 
 class App extends Component {
-  render () {
+  render() {
     return (
       <BrowserRouter>
         <div className="App">
-          <Navbar></Navbar>
-          {/* <Dashboard></Dashboard> */}
-          {/* <Video></Video> */}
+          <Navbar />
           <Switch>
-            {/* <Route path='/about' component={Dashboard}></Route> */}
-            {/* <Route path='/contact/:id' component={ContactDetails}></Route> */}
-            <Route path='/' component={Video}></Route>
+            <Route exact path="/" component={Video} />
+            <Route path="/about" component={Dashboard} />
+            <Route path="/transcripts" component={Transcripts} />
+            <Route path="/contacts" component={ContactList} />
+            <Route path="/signin" component={SignIn} />
+            <Route path="/signup" component={SignUp} />
           </Switch>
         </div>
       </BrowserRouter>

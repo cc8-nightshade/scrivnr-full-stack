@@ -9,7 +9,8 @@ export default class Video extends Component {
 
     this.state = {
       mySocket: '',
-      myPeerConnection: '',
+      myPeerConnection: undefined,
+      acceptCall: false
     
     }
   }
@@ -24,6 +25,7 @@ export default class Video extends Component {
     // alert("tesitng123");
     // this.state.mySocket = io.connect('https://192.168.10.81:9000/');
     const tempSocket = io.connect();
+    // 'localhost:9000'
     // this.setState({
     //   mySocket: tempSocket
     // })
@@ -123,10 +125,10 @@ export default class Video extends Component {
   }
   
   handleVideoOfferMessage = async (videoOfferData) => {
-    let newConnection = this.createPeerConnection();
-    await this.setState({
-      myPeerConnection: newConnection
-    })
+   
+
+    await this.createPeerConnection();
+    
     let offerDescription = new RTCSessionDescription(videoOfferData.sdp);
     console.log("session description receiving", offerDescription);
     this.state.myPeerConnection.setRemoteDescription(offerDescription)
@@ -147,9 +149,11 @@ export default class Video extends Component {
           localStream.getTracks().forEach((track) => this.state.myPeerConnection.addTrack(track, localStream));
         })
       .then(() => {
+        console.log('answer created')
         return this.state.myPeerConnection.createAnswer();
       })
       .then((answer) => {
+        console.log('description set')
         return this.state.myPeerConnection.setLocalDescription(answer);
       })
       .then(()=>{
@@ -161,6 +165,7 @@ export default class Video extends Component {
           sdp: this.state.myPeerConnection.localDescription
         });
       });
+    
   }
   
   handleVideoAnswerMessage = (videoAnswerData) => {
@@ -202,6 +207,12 @@ export default class Video extends Component {
     //   type: "hang-up"
     // }
     );
+  }
+
+  acceptCall = () => {
+    this.setState({
+      acceptCall: !this.acceptCall
+    })
   }
 
   closeVideoCall = () => {
@@ -258,6 +269,7 @@ export default class Video extends Component {
       </div>
       <div className="button-wrapper">
         <button onClick={this.startCall} className="waves-effect waves-light btn-large">Start Chat</button>
+        {/* <button onClick={this.acceptCall} className="waves-effect waves-light btn-large">Accept Call</button> */}
         <button id="hangup-button" className="waves-effect waves-light blue darken-1 btn-large" onClick={this.hangUpCall}>
           Hang Up
         </button>

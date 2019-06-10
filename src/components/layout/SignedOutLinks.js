@@ -10,16 +10,16 @@ const SignedOutLinks = () => {
           <a href="#" data-target="mobile-demo" className="sidenav-trigger"><i className="material-icons">menu</i></a>
           <ul className="right hide-on-med-and-down">
             <li><NavLink to='/about'>About</NavLink></li>
-            <li><NavLink to='/about'>Sign Up</NavLink></li>
-            <li><NavLink to='/about'>Sign In</NavLink></li>
+            <li><NavLink to='/signup'>Sign Up</NavLink></li>
+            <li><NavLink to='/signin'>Sign In</NavLink></li>
           </ul>
         </div>
       
 
       <ul className="sidenav" id="mobile-demo">
         <li><NavLink to='/about'>About</NavLink></li>
-        <li><NavLink to='/about'>Sign Up</NavLink></li>
-        <li><NavLink to='/about'>Sign In</NavLink></li>
+        <li><NavLink to='/signup'>Sign Up</NavLink></li>
+        <li><NavLink to='/signin'>Sign In</NavLink></li>
       </ul>
     </div>
     

@@ -108,3 +108,24 @@ height: 480px; */
     height: 20px;
   }
 }
+
+
+/* MESSAGES component */
+.transcripts {
+  /* margin: 20px; */
+}
+.sendMessage {
+  widows: 40%;
+  height: 100px;
+  margin: 10px;
+
+  background-color: pink;
+  margin-left: -10px;
+}
+.receiveMessage {
+  widows: 40%;
+  height: 100px;
+  margin: 10px;
+  background-color: beige;
+  /* margin-right: 20px; */
+}

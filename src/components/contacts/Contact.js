@@ -1,12 +1,12 @@
 import React from 'react';
 
-const Contact = () => {
+const Contact = ({contactInfo}) => {
   return(
     <div className="contact">
-        <div className="card ">
-            <h3>name</h3>
-            <h4>info</h4>
-        </div>
+      <div className="card ">
+        <p>{contactInfo.id}</p>
+        <h5>{contactInfo.firstName} {contactInfo.lastName}</h5>
+      </div>
     </div>
   )
 }

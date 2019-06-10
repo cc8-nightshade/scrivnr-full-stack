@@ -23,8 +23,7 @@
     <!--Import materialize.css-->
     <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/sandstone/bootstrap.min.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
-
+    
     <title>React App</title>
   </head>
   <body>
@@ -33,21 +32,27 @@
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
-
+      
       You can add webfonts, meta tags, or analytics to this file.
       The build step will place the bundled scripts into the <body> tag.
+        
+        To begin the development, run `npm start` or `yarn start`.
+        To create a production bundle, use `npm run build` or `yarn build`.
+      -->
+      <!-- <script src="./main.js"></script> -->
+      <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-    <!-- <script src="./main.js"></script> -->
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/6.1.1/firebase-app.js"></script>
+<!-- TODO: Add SDKs for Firebase products that you want to use
+  https://firebase.google.com/docs/web/setup#config-web-app -->
+  
+  <script>
+    // document.addEventListener('DOMContentLoaded', function() {
+    //   var elems = document.querySelectorAll('.sidenav');
+    //   var instances = M.Sidenav.init(elems, options);
+    // });
 
-    <!-- TODO: Add SDKs for Firebase products that you want to use
-        https://firebase.google.com/docs/web/setup#config-web-app -->
-
-    <script>
       require('dotenv').config()
       // Your web app's Firebase configuration
       var firebaseConfig = {
