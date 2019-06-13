@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import { NavLink } from 'react-router-dom'
 
 
-class  SignedInLinks extends Component {
+class SignedInLinks extends Component {
 
   componentDidMount(){
    

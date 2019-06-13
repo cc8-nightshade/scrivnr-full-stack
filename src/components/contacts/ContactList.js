@@ -2,7 +2,11 @@ import React, { Component } from "react";
 import Contact from "./Contact";
 import CreateContact from "./CreateContact";
 import { connect } from "react-redux";
-import { createContact } from "../../store/actions/contactsActions"
+import { getContacts } from "../../store/actions/contactsActions"
+
+
+
+// "redux-firestore": "^1.0.0-alpha.2",
 
 class ContactList extends Component {
   constructor(props) {
@@ -11,6 +15,10 @@ class ContactList extends Component {
     this.state = {
       showCreateFrom: false
     };
+  }
+
+  componentDidMount(){
+    this.props.getContact()
   }
 
   clickhandler() {
@@ -25,12 +33,13 @@ class ContactList extends Component {
       form = <CreateContact />;
     }
 
+    console.log(this.props)
     const { contacts } = this.props;
     return (
       <div className="contact-list container">
         {contacts &&
-          contacts.map(contact => {
-            return <Contact contactInfo={contact} key={contact.id} />;
+          contacts.map((contact, index) => {
+            return <Contact contactInfo={contact} key={index} />;
           })}
         <button className="btn" onClick={this.clickhandler}>
           Add new contact
@@ -47,6 +56,18 @@ const mapStateToProps = state => {
   };
 };
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getContact: () => dispatch(getContacts())
+  }
+}
 
 
-export default connect(mapStateToProps)(ContactList);
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactList);
+// export default compose(
+//   connect( mapStateToProps),
+//   firestoreConnect([
+//     { collection: 'contacts' }
+//   ]),
+// )(ContactList)
