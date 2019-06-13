@@ -1,0 +1,14 @@
+.alignLeft {
+    text-align: left;
+}
+.alignRight {
+    text-align: right;
+}
+
+.textBox {
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+    background-color: #d4edf8;
+    max-width: 50%;
+}
