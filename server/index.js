@@ -116,12 +116,12 @@ io.on("connection", (socket) => {
       bufferData[socket.id] = [];
     }
     
-    console.log(blob64.substring(0,30));
+    // console.log(blob64.substring(0,30));
 
     bufferData[socket.id].push(Buffer.from(blob64, "base64"));
     // bufferData[socket.id].push(Buffer.from(blob64));
     console.log(`User ${socket.id} has -- ${bufferData[socket.id].length} -- pieces of data`)
-    console.log(bufferData[socket.id][bufferData[socket.id].length - 1]);
+    // console.log(bufferData[socket.id][bufferData[socket.id].length - 1]);
   });
   socket.on("end-record", async () => {
     // console.log(typeof blobData[0]);
