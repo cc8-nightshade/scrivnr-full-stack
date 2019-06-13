@@ -34,7 +34,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "devserv": "nodemon --watch server ./server/index.js"
+    "devserv": "nodemon --watch server ./server/index.js",
+    "preinstall": "node ./server/gcpSetup.js"
   },
   "eslintConfig": {
     "extends": "react-app"
