@@ -52,6 +52,7 @@ let connectedUsers = [];
 let connectedUsersObject = {};
 let bufferData = {};
 
+
 io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     delete connectedUsers[socket.id];
