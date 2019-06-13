@@ -1,18 +1,5 @@
 const intitialState = {
-  contacts: [
-    { id: 1,
-      firstName: 'Min',
-      lastName: 'Kim'
-    },
-    { id: 2,
-      firstName: 'Ian',
-      lastName: 'Cameron'
-    },
-    { id: 3,
-      firstName: 'Konst',
-      lastName: 'Varg'
-    },
-  ]
+  contacts: ''
 }
 
 
@@ -20,6 +7,10 @@ const contactsReducer = (state = intitialState, action) => {
   switch(action.type){
     case 'CREATE_CONTACT':
       console.log('yolo', action.contact)
+      return state
+    case 'GET_CONTACTS':
+      console.log('get reducer called', action.contactArray)
+      state.contacts = action.contactArray
       return state
   }
   return state

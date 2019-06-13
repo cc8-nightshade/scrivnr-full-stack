@@ -1,11 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from "react-redux";
 import { createContact } from "../../store/actions/contactsActions"
-import { firestoreConnect } from 'react-redux-firebase'
-import { compose } from 'redux'
-
-
-
 
 class CreateContact extends Component {
 
@@ -52,6 +47,8 @@ class CreateContact extends Component {
   }
 }
 
+
+
 const mapDispatchToProps = (dispatch) => {
   return {
     createContact: (contact) => dispatch(createContact(contact))
@@ -62,4 +59,4 @@ export default connect(null, mapDispatchToProps)(CreateContact)
 // export default compose(
 //   connect(mapStateToProps, mapDispatchToProps),
 //   firestoreConnect(),
-// )(AddCategory)
+// )(CreateContact)
