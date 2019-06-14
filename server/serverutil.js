@@ -1,15 +1,20 @@
 const shortid = require("shortid");
 const speech = require("@google-cloud/speech");
+const { firebase } = require("./firebase");
+const db = firebase.firestore();
 
 const initializeConversationData = (caller, receiver) => {
   let id = shortid.generate();
   let startDateTime = new Date();
   return {
-    id,
-    caller,
-    receiver,
-    speech: [],
-    startDateTime
+    newID: id,
+    newConversation: {
+      id,
+      caller,
+      receiver,
+      speech: [],
+      startDateTime
+    }
   };
 };
 
@@ -24,7 +29,9 @@ const extractConversationData = (speaker, googleArray) => {
     }];
   } 
   for (let result of results) {
+    // get text
     let text = result.alternatives[0].transcript;
+    // Get and Procees time
     let time = 0;
     let timeObject = result.alternatives[0].words[0].startTime;
     if (timeObject.seconds !== undefined) {
@@ -33,12 +40,16 @@ const extractConversationData = (speaker, googleArray) => {
     if (timeObject.nanos !== undefined) {
       time += timeObject.nanos/(Math.pow(10,9));
     }
-    let thisSpeech = {
-    };
+    // Checking questionable result
+    let questionable = result.alternatives[0].confidence < 0.9 ? true : false;
+
+    // Pushing element
     speechArray.push({
       speaker,
       text,
-      time
+      time,
+      bookmark: false,
+      questionable
     });
   }
   return speechArray;
@@ -51,7 +62,7 @@ const addSpeech = (conversation, newSpeechArray) => {
   }
   conversation.speech = conversation.speech.concat(newSpeechArray);
   if (pleaseSort) {
-    console.log("needs sorting");
+    // console.log("needs sorting");
     conversation.speech.sort((a,b) => {
       return a.time <= b.time ? -1 : 1;
     });
@@ -87,9 +98,19 @@ const getTranscription = async (audioBytes, socketID) => {
   return(JSON.stringify(fullResponse));
 }
 
+const addDialogue = (data) => {
+  db.collection("dialogues")
+  .add(data)
+  .then(docRef => {
+    // console.log(docRef);
+    console.log("Successfully saved data to FireStore");
+  });
+}
+
 module.exports = {
   initializeConversationData,
   extractConversationData,
   addSpeech,
-  getTranscription
+  getTranscription,
+  addDialogue
 };

@@ -5,13 +5,12 @@ import Recorder from 'opus-recorder';
 export default class Video extends Component {
   constructor(props) {
     super(props)
-
     this.state = {
       myName: '',
       mySocket: undefined,
       myPeerConnection: undefined,
       mediaRecorder: undefined,
-      //reader: new FileReader(),
+      receiverName: null,
     }
   }
 
@@ -31,19 +30,19 @@ export default class Video extends Component {
       tempSocket.on("message", (messageData) => {
         alert(messageData);
       });
-      tempSocket.on("video-offer", (callingUser, callingSocket, videoOfferData) => {
-        console.log("receiving video offer", videoOfferData);
+      tempSocket.on("rtc-offer", (callingUser, callingSocket, offerData) => {
+        console.log("receiving offer", offerData);
         if (this.state.myPeerConnection === undefined) {
-          console.log("Continuing to process processing video offer", videoOfferData);
-          this.handleVideoOfferMessage(callingUser, callingSocket, videoOfferData);
+          console.log("Continuing to process processing offer", offerData);
+          this.handleOfferMessage(callingUser, callingSocket, offerData);
         }
       });
       tempSocket.on("reject-call", (receiverName) => {
-        alert(`${receiverName} rejected your call.`);
+        alert(`${receiverName} does not exist or rejected your call.`);
         this.endCall();
       });
-      tempSocket.on("video-answer", (videoAnswerData) => {
-        this.handleVideoAnswerMessage(videoAnswerData);
+      tempSocket.on("rtc-answer", (answerData) => {
+        this.handleAnswerMessage(answerData);
       });
       tempSocket.on("new-ice-candidate", (iceCandidate) => {
         this.handleNewICECandidateMsg(iceCandidate);
@@ -58,33 +57,44 @@ export default class Video extends Component {
       mySocket: tempSocket
     });
     console.log("Initialized client-side socket: ", this.state.mySocket);
+    // talk to socket server to say "I'm online"
     this.state.mySocket.emit("initialize", this.state.myName);
   }
 
   startCall = async () => {
-    console.log("Starting a call");
-    await this.createPeerConnection();
-    console.log("Created caller's connection", this.state.myPeerConnection);
-    this.setUpOpusRecorder();
-    console.log("Created recorder");
-
-    const mediaConstraints = {audio: true, 
-      // video: true
-    };
-    navigator.mediaDevices.getUserMedia(mediaConstraints)
-      .then((localStream) => {
-        document.getElementById("local_video").srcObject = localStream;
-        localStream.getTracks().forEach(track => this.state.myPeerConnection.addTrack(track, localStream));
-        // this.state.mediaRecorder.start(localStream);
-        console.log("Basic setup of connection done");
+    const receiverName = prompt('Who do you want to call?', 'Voldemort');
+    console.log(receiverName);
+    if (receiverName !== "") {
+      console.log("Starting a call");
+      this.setState({
+        receiverName
       });
+      
+      await this.createPeerConnection();
+      console.log("Created caller's connection", this.state.myPeerConnection);
+      
+      this.setUpOpusRecorder();
+      console.log("Created recorder");
+  
+      const mediaConstraints = {audio: true, 
+        // video: true
+      };
+      navigator.mediaDevices.getUserMedia(mediaConstraints)
+        .then((localStream) => {
+          document.getElementById("local_video").srcObject = localStream;
+          localStream.getTracks().forEach(track => this.state.myPeerConnection.addTrack(track, localStream));
+          console.log("Tracks added to connection");
+        });
+    } 
+    else { // If they didn't enter any name
+      alert("Please enter a user name");
+    }
   }
   
   createPeerConnection = async () => {
     let newPeerConnection = await new RTCPeerConnection({
         iceServers: [{urls: "stun:stun.l.google.com:19302"}]
     });
-
     newPeerConnection.onicecandidate = this.handleICECandidateEvent;
     newPeerConnection.ontrack = this.handleTrackEvent;
     newPeerConnection.onnegotiationneeded = this.handleNegotiationNeededEvent;
@@ -107,9 +117,14 @@ export default class Video extends Component {
           this.state.myPeerConnection.setLocalDescription(offer);
           console.log("Offer created, sending to server:", offer)
         });
-      this.state.mySocket.emit("video-offer", this.state.myName, {
-        sdp: this.state.myPeerConnection.localDescription
-      });
+      this.state.mySocket.emit(
+        "rtc-offer", 
+        this.state.myName,
+        this.state.receiverName,
+        {
+          sdp: this.state.myPeerConnection.localDescription
+        }
+      );
     }
     // TODO  .catch(reportError);
   }
@@ -119,16 +134,14 @@ export default class Video extends Component {
     document.getElementById("received_video").srcObject = event.streams[0];
   }
   
-  handleVideoOfferMessage = async (callerName, callerSocket, videoOfferData) => {
+  handleOfferMessage = async (callerName, callerSocket, offerData) => {
     // Check to see if they accept, and only continue setting up connection if yes
-    console.log("session description receiving", videoOfferData.sdp);
+    console.log("session description receiving", offerData.sdp);
     
-  if (window.confirm(`Would you like to accept a call from ${callerName}?`)) {
-    await this.createPeerConnection();
-    await this.state.myPeerConnection.setRemoteDescription(videoOfferData.sdp);
-    
-    await this.setUpOpusRecorder();
-
+    if (window.confirm(`Would you like to accept a call from ${callerName}?`)) {
+      await this.createPeerConnection();
+      await this.state.myPeerConnection.setRemoteDescription(offerData.sdp);
+      await this.setUpOpusRecorder();
 
       let mediaConstraints = {audio: true, 
         // video: true
@@ -144,20 +157,20 @@ export default class Video extends Component {
           this.state.myPeerConnection.setLocalDescription(answer);
         });
       console.log("Answer created and sending:", this.state.myPeerConnection.localDescription)
-      this.state.mySocket.emit("video-answer", {
-        sdp: this.state.myPeerConnection.localDescription
-      });
-    
+      this.state.mySocket.emit(
+        "rtc-answer", 
+        callerSocket, 
+        {sdp: this.state.myPeerConnection.localDescription}
+      );
     } 
-      // If the user rejects call
-    else { 
+    else { // If the user rejects call
       this.state.mySocket.emit("reject-call", this.state.myName, callerSocket);
       this.resetMyPeerConnection();
       // TODO Destroy recorder!
     }
   }
   
-  handleVideoAnswerMessage = (videoAnswerData) => {
+  handleAnswerMessage = (answerData) => {
     const mediaConstraints = {audio: true, 
       // video: true
     };
@@ -166,10 +179,10 @@ export default class Video extends Component {
         this.state.mediaRecorder.start(localStream);
         console.log("Started Recording");
       });
-    console.log("handling video answer", videoAnswerData.sdp);
-    this.state.myPeerConnection.setRemoteDescription(videoAnswerData.sdp)
+    console.log("handling answer", answerData.sdp);
+    this.state.myPeerConnection.setRemoteDescription(answerData.sdp)
       .then(() => {
-        console.log("processed video answer successfully")
+        console.log("processed answer successfully")
       })
       .catch((err) => console.log("error handling answer", err));
   }
@@ -192,15 +205,22 @@ export default class Video extends Component {
 
     // ENDING OF CALLS
   hangUpCall = () => {
+    console.log("Hanging up call");
     this.state.mySocket.emit("hang-up");
     this.endCall();
   }
 
   // Refactored out of hangUpCall because it needs to be run when the other party hangs up  
   endCall = () => {
-    this.state.mediaRecorder.stop();
-    setTimeout(() => {this.state.mySocket.emit("end-record");}, 3000);
+    console.log("Shutting down call.")
+    if (this.state.mediaRecorder) {
+      this.state.mediaRecorder.stop();
+      setTimeout(() => {this.state.mySocket.emit("end-record");}, 3000);
+    }
     this.resetMyPeerConnection();
+    this.setState({
+      mediaRecorder: null
+    });
     // TODO - Change color of buttons etc based on call status
   }
 
@@ -223,9 +243,7 @@ export default class Video extends Component {
 
   // Utility for setUpOpusRecorder to change buffer to base64
   bufferToBase64 = (buf) => {
-    let binstr = Array.prototype.map.call(buf, function (ch) {
-        return String.fromCharCode(ch);
-    }).join('');
+    let binstr = buf.map(char => String.fromCharCode(char)).join('');
     return btoa(binstr);
   } 
 
@@ -264,59 +282,40 @@ export default class Video extends Component {
   }
 
   // For test of ONLY recording. LEFT FOR REFERENCE ONLY
-  startRecording = async () => {
-    var mediaConstraints = {
-      audio: true
-    };
-    // ---------------------START OPUS-RECORDER CODE
-    let recorderConfig = {
-      encoderPath: "../audio/encoderWorker.min.js",
-      numberOfChannels: 1,
-      streamPages: true,
-      originalSampleRateOverride: 16000
-    };
-    let rec = new Recorder (recorderConfig);
-    rec.ondataavailable = (arrayBuffer) => {
-      // STRING ATTEMPT
-      //let sendString = "[" + arrayBuffer.toString() + "]";
-      //console.log(sendString);
-      this.state.mySocket.emit("send-blob", this.bufferToBase64(arrayBuffer));
+  // startRecording = async () => {
+  //   var mediaConstraints = {
+  //     audio: true
+  //   };
+  //   // ---------------------START OPUS-RECORDER CODE
+  //   let recorderConfig = {
+  //     encoderPath: "../audio/encoderWorker.min.js",
+  //     numberOfChannels: 1,
+  //     streamPages: true,
+  //     originalSampleRateOverride: 16000
+  //   };
+  //   let rec = new Recorder (recorderConfig);
+  //   rec.ondataavailable = (arrayBuffer) => {
+  //     // STRING ATTEMPT
+  //     //let sendString = "[" + arrayBuffer.toString() + "]";
+  //     //console.log(sendString);
+  //     this.state.mySocket.emit("send-blob", this.bufferToBase64(arrayBuffer));
 
-    };
+  //   };
     
-    rec.onstart = function () {console.log("recorder started")};
-    await this.setState({
-      mediaRecorder: rec
-    });
+  //   rec.onstart = function () {console.log("recorder started")};
+  //   await this.setState({
+  //     mediaRecorder: rec
+  //   });
     
-    navigator.mediaDevices.getUserMedia(mediaConstraints)
-      .then((localStream) => {
-        this.state.mediaRecorder.start(localStream);
-      });
-  }
+  //   navigator.mediaDevices.getUserMedia(mediaConstraints)
+  //     .then((localStream) => {
+  //       this.state.mediaRecorder.start(localStream);
+  //     });
+  // }
   
   // For stand-alone recording tests. LEFT FOR REFERENCE ONLY
   stopRecording = () => {
-    // ---------------------START OPUS-RECORDER CODE
     this.state.mediaRecorder.stop();
-    // END OPUS-RECORDER CODE
-
-    // -------- CODE FOR using recorder-js
-    // this.state.mediaRecorder.stop()
-    // .then(({blob, buffer}) => {
-    //     // console.log("finished recording, wav blob: ", blob);
-    //     this.state.reader.readAsDataURL(blob); 
-    //     this.state.reader.onloadend = () => {
-    //       // console.log(this.state.reader.result); //.substring(22));
-    //       console.log("final data", this.state.reader.result.substring(22)); //.substring(22));
-    //       //this.state.mySocket.emit("send-blob", this.state.reader.result.substring(22));
-    //     }
-    //   });
-    // --------- END recorder-js
-      
-    // this.setState({
-    //   isRecording: false
-    // });
     setTimeout(() => {
       console.log("asking server to translate");
       this.state.mySocket.emit("end-record");
@@ -336,7 +335,6 @@ export default class Video extends Component {
   //     }
   //   }
   // }
-  // Things for recording
 
  
   render() {
