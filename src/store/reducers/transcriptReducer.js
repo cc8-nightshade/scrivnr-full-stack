@@ -1,24 +1,16 @@
 const intitialState = {
-  transcript: [
-    { id: 1,
-      caller: 'ABC',
-      receiver: '123',
-      startDateTime: '2020:9:11:14:34:52',
-      speech: [
-        { time: '12:00:23',
-          text: 'Hey there Frank!'
-        },
-        { time: '12:00:30',
-          text: 'Who is this?'
-        },
-      ]
-    }
-  ]
+  transcript: []
 }
 
 
 const transcriptReducer = (state = intitialState, action) => {
- return state
+  switch(action.type){
+    case 'GET_TRANSCRIPTS':
+      console.log('get trans reducer called', action.transcriptArray)
+      state.transcript = action.transcriptArray
+      return state
+  }
+  return state
 }
 
 export default transcriptReducer
