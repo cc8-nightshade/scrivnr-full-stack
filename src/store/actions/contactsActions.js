@@ -1,10 +1,6 @@
 export const createContact = (contact) => {
   return (dispatch, getState, { getFirestore }) => {
-    console.log('action called')
-    console.log('action', contact)
     const firestore = getFirestore()
-    console.log(firestore)
-    console.log('after firestore', contact.firstName)
     firestore.collection('contacts').add({
       firstName: contact.firstName,
       lastName: contact.lastName,
@@ -24,16 +20,13 @@ export const createContact = (contact) => {
 
 export const getContacts = () => {
   return (dispatch, getState, { getFirestore }) => {
-    console.log('get action called')
     const firestore = getFirestore()
-    console.log(firestore)
     firestore.collection('contacts').get()
     .then(querySnapshot => {
       let contactArray = []
       querySnapshot.forEach(doc => {
         contactArray.push(doc.data())
       });
-      console.log(contactArray)
       dispatch({ type: "GET_CONTACTS", contactArray }
       );
     })

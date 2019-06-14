@@ -6,6 +6,8 @@ import ContactList from "./components/contacts/ContactList";
 import Video from "./components/dashboard/Video";
 import SignIn from "./components/auth/SignIn";
 import SignUp from "./components/auth/SignUp";
+import SignUpV from "./components/auth/SignUpV"
+
 import Transcripts from "./components/dashboard/Transcripts";
 import "./App.css";
 
@@ -22,6 +24,7 @@ class App extends Component {
             <Route path="/contacts" component={ContactList} />
             <Route path="/signin" component={SignIn} />
             <Route path="/signup" component={SignUp} />
+            <Route path="/signupv" component={SignUpV} />
           </Switch>
         </div>
       </BrowserRouter>

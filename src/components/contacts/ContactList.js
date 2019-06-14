@@ -33,7 +33,6 @@ class ContactList extends Component {
       form = <CreateContact />;
     }
 
-    console.log(this.props)
     const { contacts } = this.props;
     return (
       <div className="contact-list container">
