@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import Contact from "./Contact";
 import CreateContact from "./CreateContact";
 import { connect } from "react-redux";
-import { getContacts } from "../../store/actions/contactsActions"
+import { getUserInfoByCurrentUser, getUsers } from "../../store/actions/usersActions"
+import { Redirect } from "react-router-dom"
 
 
 
@@ -18,7 +19,8 @@ class ContactList extends Component {
   }
 
   componentDidMount(){
-    this.props.getContact()
+    this.props.getUserInfoByCurrentUser()
+    this.props.getUsers()
   }
 
   clickhandler() {
@@ -33,31 +35,49 @@ class ContactList extends Component {
       form = <CreateContact />;
     }
 
-    const { contacts } = this.props;
+    const { users, auth, currentUserInfo, contacts } = this.props;
+    console.log('userInfo: ', currentUserInfo,'contacts: ', contacts )
+    if(!auth.uid){
+      return <Redirect to='/signin'></Redirect>
+    }
     return (
-      <div className="contact-list container">
-        {contacts &&
-          contacts.map((contact, index) => {
-            return <Contact contactInfo={contact} key={index} />;
-          })}
-        <button className="btn" onClick={this.clickhandler}>
-          Add new contact
-        </button>
-        {form}
+      <div>
+
+        {/* <div>
+          {contacts.contacts && contacts.contacts.map((contact, index) => {
+              return <div> {contact}</div>;
+            })}
+        </div> */}
+        <div className="contact-list container">
+        {/* <p>{contacts.uid}</p> */}
+          {users &&
+            users.map((contact, index) => {
+              return <Contact contactInfo={contact} key={index} />;
+            })}
+          <button className="btn" onClick={this.clickhandler}>
+            Add new contact
+          </button>
+          {form}
+        </div>
       </div>
     );
   }
 }
 
 const mapStateToProps = state => {
+  // console.log('contactList props:', state)
   return {
-    contacts: state.contacts.contacts
+    users: state.users.users,
+    currentUserInfo: state.users.userInfo,
+    contacts: state.users.userInfo,
+    auth: state.firebase.auth
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    getContact: () => dispatch(getContacts())
+    getUserInfoByCurrentUser: () => dispatch(getUserInfoByCurrentUser()),
+    getUsers: () => dispatch(getUsers())
   }
 }
 

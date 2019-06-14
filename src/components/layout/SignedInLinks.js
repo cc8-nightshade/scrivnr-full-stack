@@ -7,6 +7,7 @@ const SignedInLinks = (props) => {
   return (
     <div>
       <ul className="right">
+        <li>{props.profile.userName}</li>
         <li><NavLink to='/transcripts'>Transcripts</NavLink></li>
         <li><NavLink to='/contacts'>Contacts</NavLink></li>
         <li><a onClick={props.signOut}>Log Out</a></li>

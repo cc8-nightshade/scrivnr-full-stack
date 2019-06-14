@@ -6,9 +6,9 @@ import SignedOutLinks from './SignedOutLinks'
 // z-depth-0 remove shadow
 
 const Navbar = (props) => {
-  const { auth } = props
-  console.log(auth)
-  const links = auth.uid ? <SignedInLinks></SignedInLinks> : <SignedOutLinks></SignedOutLinks>
+  const { auth, profile } = props
+  // console.log('current user: ', auth)
+  const links = auth.uid ? <SignedInLinks profile={profile}></SignedInLinks> : <SignedOutLinks></SignedOutLinks>
 
   return (
     <nav className="nav-wrapper teal darken-3 z-depth-0">
@@ -20,8 +20,10 @@ const Navbar = (props) => {
 }
 
 const mapStateToProps = state => {
+  // console.log('state: ', state)
   return {
-    auth: state.firebase.auth
+    auth: state.firebase.auth,
+    profile: state.firebase. profile
   }
 }
 

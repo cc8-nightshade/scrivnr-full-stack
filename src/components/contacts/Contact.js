@@ -1,6 +1,7 @@
 import React from 'react';
 
 const Contact = ({contactInfo}) => {
+  // console.log('contact:' ,contactInfo)
   return(
     <div className="contact">
       <div className="card ">
