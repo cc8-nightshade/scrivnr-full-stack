@@ -18,23 +18,20 @@ export const getUsers = () => {
 
   };
 };
-export const searchUsers = (inputEmail) => {
+export const searchUsers = (input) => {
   return (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore()
-    console.log('search action called', inputEmail)
-
     // onSnapshot - try to implement for auto-updating
-    firestore.collection('users').where('email', '==', inputEmail).get().then(querySnapshot => {
-      let searchedUser = []
-      // not working
-      console.log("query: ", querySnapshot)
+    firestore.collection('users').where('email', '==', input.searchedEmail).get().then(querySnapshot => {
+      let searchedEmail = []
+      // not working // 
       querySnapshot.forEach(doc => {
-        console.log(doc)
-        searchedUser.push(doc.data())
+        console.log(doc.id)
+        searchedEmail.push(doc.data())
       });
-      console.log('serchedUser:', searchedUser)
+      console.log('serchedUser:', searchedEmail)
 
-      dispatch({ type: "SEARCH_USERS", searchedUser }
+      dispatch({ type: "SEARCH_USERS", searchedEmail }
       );
     })
     .catch((err) => {

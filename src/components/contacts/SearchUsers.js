@@ -5,8 +5,15 @@ import { searchUsers } from "../../store/actions/usersActions";
 
 export class SearchUsers extends Component {
 
-  state = {
-    
+  constructor(props){
+    super(props);
+    this.state = {
+
+    }
+  }
+
+  componentDidMount(){
+    console.log(this.props.searchedEmail)
   }
 
   handleChange = (event) => {
@@ -17,32 +24,34 @@ export class SearchUsers extends Component {
   handleSubmit = (event) => {
     console.log('hello submit')
     event.preventDefault()
-    console.log(this.state)
+    console.log(this.props.searchedEmail)
     this.props.searchUsers(this.state)
 
   }
 
   render() {
-    const { searchedUser } = this.props
-    console.log('serch user:' , searchedUser)
+    console.log(this.props)
+    const { searchedEmail } = this.props
+    console.log('search result:' , searchedEmail)
     return (
       <div className="">
         <form onSubmit={this.handleSubmit} className="white">
           <div>
             <label htmlFor='number'>Search by Email</label>
-            <input type="text" id="searched-email" onChange={this.handleChange}/>
+            <input type="text" id="searchedEmail" onChange={this.handleChange}/>
           </div>
           <div className="input-field">
             <button type="submit" className="btn">Search</button>
           </div>
         </form>
+        { searchedEmail && <div>{searchedEmail[0].userName} {searchedEmail[0].email}</div>} 
       </div>
     )
   }
 }
 
 const mapStateToProps = (state) => ({
-  searchedUser: state.users.searchedUser
+  searchedEmail: state.users.searchedEmail
 })
 
 const mapDispatchToProps = dispatch => ({

@@ -57,7 +57,7 @@ class ContactList extends Component {
          {/* {onlineNow} */}
         </div>
         <div className="search-users">
-          {/* <SearchUsers></SearchUsers> */}
+          <SearchUsers></SearchUsers>
         </div>
         <div className="user-list">
           {/* <AddContact></AddContact> */}
@@ -108,9 +108,4 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(ContactList);
-// export default compose(
-//   connect( mapStateToProps),
-//   firestoreConnect([
-//     { collection: 'contacts' }
-//   ]),
-// )(ContactList)
+
