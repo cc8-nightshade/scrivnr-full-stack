@@ -35,6 +35,10 @@ class ContactList extends Component {
     });
   }
 
+  connectWithThisUser(otherPerson) {
+    console.log(otherPerson)
+  }
+
   render() {
     let form;
     if (this.state.showCreateFrom) {
@@ -63,8 +67,8 @@ class ContactList extends Component {
           {contacts &&
             contacts.map((contact, index) => {
               if(onlineNow.includes(contact.email)){
-
-                return <div key={index}>{contact.firstName} {contact.lastName}: {contact.email} </div>;
+                return <div onClick={() => this.connectWithThisUser(contact.email)} 
+                key={index}>{contact.firstName} {contact.lastName}: {contact.email} </div>;
               }
             })}
         </div>
