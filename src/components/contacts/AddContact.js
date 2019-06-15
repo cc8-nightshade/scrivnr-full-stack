@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import {
-  getUsers
-} from "../../store/actions/usersActions";
+import { getUsers } from "../../store/actions/usersActions";
 import { Redirect } from "react-router-dom";
 
 class AddContact extends Component {
@@ -12,16 +10,16 @@ class AddContact extends Component {
   }
 
   render() {
-    const { users, auth } = this.props;
+    const { users, auth, onlineNow } = this.props;
     if (!auth.uid) {
       return <Redirect to="/signin" />;
     }
     return (
-      <div>
+      <div> 
         {users &&
           users.map((contact, index) => {
             return <div key={index}>
-              {contact.uid}
+              {contact.email} {contact.uid}
             </div>;
           })}    
       </div>

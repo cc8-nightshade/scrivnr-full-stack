@@ -3,7 +3,10 @@ import { connect } from "react-redux";
 import { createContact } from "../../store/actions/contactsActions"
 
 class CreateContact extends Component { 
-  
+  state = {
+    
+  }
+
   handleChange = (event) => {
     console.log(event)
     this.setState({
