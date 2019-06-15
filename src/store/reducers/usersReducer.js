@@ -12,7 +12,7 @@ const usersReducer = (state = intitialState, action) => {
       state.users = action.userArray
       return state
     case 'GET_USERINFO':
-      state.userInfo = action.arr
+      state.userInfo = action.userInfo
       return state
     case 'GET_USERINFO_ERROR':
       return state

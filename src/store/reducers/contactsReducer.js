@@ -1,5 +1,5 @@
 const intitialState = {
-  contacts: ''
+  contactArray: ''
 }
 
 
@@ -8,7 +8,7 @@ const contactsReducer = (state = intitialState, action) => {
     case 'CREATE_CONTACT':
       return state
     case 'GET_CONTACTS':
-      state.users = action.userArray
+      state.contactArray = action.contactArray
       return state
   }
   return state

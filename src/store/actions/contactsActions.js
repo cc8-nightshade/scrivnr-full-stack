@@ -19,3 +19,34 @@ export const createContact = (contact) => {
 
   };
 };
+
+
+export const getContactsByCurrentUser = () => {
+  return (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore()
+    const profile = getState().firebase.profile
+    const userID = getState().firebase.auth.uid // later for mapping userid to contacts
+    // onSnapshot - try to implement for auto-updating
+    firestore.collection('users').where('uid', '==', userID).get().then(querySnapshot => {
+      let userInfo = []
+      querySnapshot.forEach(doc => {
+        userInfo.push(doc.data())
+      });
+      return userInfo
+    })
+    .then((userInfo) => {
+      const obj = userInfo[0].contacts;
+      const values = Object.values(obj)
+      const contactArray = [];
+      values.forEach(contact => {
+        contactArray.push(contact)
+      })
+      dispatch({ type: "GET_CONTACTS", contactArray }
+      );
+    })
+    .catch((err) => {
+      dispatch({ type: "GET_CONTACTS_ERROR", err})
+    })
+
+  };
+};

@@ -29,38 +29,13 @@ export const getUserInfoByCurrentUser = () => {
       let userInfo = []
       querySnapshot.forEach(doc => {
         userInfo.push(doc.data())
-      });
-      console.log(userInfo[0].contacts)
-      return userInfo
-    })
-    .then((userInfo) => {
-      console.log('useeeee', userInfo);
-      console.log('eeeee', userInfo[0].contacts);
-      let obj = userInfo[0].contacts;
-      const values = Object.values(obj)
-      console.log('values:', values) // [28, 17, 54] 
-      // let b = JSON.stringify(obj)
-      // let c = JSON.parse(b)
-      // console.log(c)
-      // console.log(obj[1].email)
-      let arr = [];
-      // for (let contact of c){
-      //   console.log('HELLO', contact)
-      //   arr.push(contact.email)
-      // }
-      values.forEach(contact => {
-        console.log('HEY')
-        arr.push(contact)
-      })
-     console.log(arr)
-      dispatch({ type: "GET_USERINFO", arr }
+      });     
+      dispatch({ type: "GET_USERINFO", userInfo }
       );
-
-    })
+    })  
     .catch((err) => {
       dispatch({ type: "GET_USERINFO_ERROR", err})
     })
-
   };
 };
 

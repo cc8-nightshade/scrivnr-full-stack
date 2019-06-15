@@ -2,10 +2,12 @@ import React, { Component } from "react";
 import Contact from "./Contact";
 import CreateContact from "./CreateContact";
 import { connect } from "react-redux";
-import { getUserInfoByCurrentUser, getUsers } from "../../store/actions/usersActions"
-import { Redirect } from "react-router-dom"
-
-
+import {
+  getUserInfoByCurrentUser,
+  getUsers
+} from "../../store/actions/usersActions";
+import { getContactsByCurrentUser } from "../../store/actions/contactsActions";
+import { Redirect } from "react-router-dom";
 
 // "redux-firestore": "^1.0.0-alpha.2",
 
@@ -18,9 +20,10 @@ class ContactList extends Component {
     };
   }
 
-  componentDidMount(){
-    this.props.getUserInfoByCurrentUser()
-    this.props.getUsers()
+  componentDidMount() {
+    this.props.getUserInfoByCurrentUser();
+    this.props.getContactsByCurrentUser();
+    this.props.getUsers();
   }
 
   clickhandler() {
@@ -36,54 +39,52 @@ class ContactList extends Component {
     }
 
     const { users, auth, currentUserInfo, contacts } = this.props;
-    console.log('userInfo: ', currentUserInfo,'contacts: ', contacts )
-    if(!auth.uid){
-      return <Redirect to='/signin'></Redirect>
+    if (!auth.uid) {
+      return <Redirect to="/signin" />;
     }
     return (
-      <div>
-
-        {/* <div>
-          {contacts.contacts && contacts.contacts.map((contact, index) => {
-              return <div> {contact}</div>;
+      <div className="contact-list container">
+        <div>
+          {contacts &&
+            contacts.map((contact, index) => {
+              return <div key={index}>{contact.firstName} {contact.lastName}: {contact.email} </div>;
             })}
-        </div> */}
-        <div className="contact-list container">
-        {/* <p>{contacts.uid}</p> */}
-          {users &&
-            users.map((contact, index) => {
-              return <Contact contactInfo={contact} key={index} />;
-            })}
-          <button className="btn" onClick={this.clickhandler}>
-            Add new contact
-          </button>
-          {form}
         </div>
+        {/* <p>{contacts.uid}</p> */}
+        {users &&
+          users.map((contact, index) => {
+            return <Contact contactInfo={contact} key={index} />;
+          })}
+        <button className="btn" onClick={this.clickhandler}>
+          Add new contact
+        </button>
+        {form}
       </div>
     );
   }
 }
 
 const mapStateToProps = state => {
-  // console.log('contactList props:', state)
   return {
     users: state.users.users,
     currentUserInfo: state.users.userInfo,
-    contacts: state.users.userInfo,
+    contacts: state.contacts.contactArray,
     auth: state.firebase.auth
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
     getUserInfoByCurrentUser: () => dispatch(getUserInfoByCurrentUser()),
+    getContactsByCurrentUser: () => dispatch(getContactsByCurrentUser()),
     getUsers: () => dispatch(getUsers())
-  }
-}
+  };
+};
 
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(ContactList);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ContactList);
 // export default compose(
 //   connect( mapStateToProps),
 //   firestoreConnect([
