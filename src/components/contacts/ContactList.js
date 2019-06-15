@@ -8,6 +8,7 @@ import {
 } from "../../store/actions/usersActions";
 import { getContactsByCurrentUser } from "../../store/actions/contactsActions";
 import { Redirect } from "react-router-dom";
+import AddContact from "./AddContact";
 
 // "redux-firestore": "^1.0.0-alpha.2",
 
@@ -38,12 +39,15 @@ class ContactList extends Component {
       form = <CreateContact />;
     }
 
-    const { users, auth, currentUserInfo, contacts } = this.props;
+    const { users, auth, contacts } = this.props;
     if (!auth.uid) {
       return <Redirect to="/signin" />;
     }
     return (
       <div className="contact-list container">
+        <div className="user-list">
+          <AddContact></AddContact>
+        </div>
         <div>
           {contacts &&
             contacts.map((contact, index) => {

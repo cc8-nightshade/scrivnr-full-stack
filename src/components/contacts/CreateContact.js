@@ -2,11 +2,8 @@ import React, { Component } from 'react'
 import { connect } from "react-redux";
 import { createContact } from "../../store/actions/contactsActions"
 
-class CreateContact extends Component {
-
-  state = {   
-  } 
-
+class CreateContact extends Component { 
+  
   handleChange = (event) => {
     console.log(event)
     this.setState({
