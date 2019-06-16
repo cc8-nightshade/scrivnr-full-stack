@@ -5,7 +5,7 @@ const intitialState = {
 
 const contactsReducer = (state = intitialState, action) => {
   switch(action.type){
-    case 'CREATE_CONTACT':
+    case 'ADD_CONTACT':
       return state
     case 'GET_CONTACTS':
       state.contactArray = action.contactArray

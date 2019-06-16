@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { searchUsers } from "../../store/actions/usersActions";
+import { addToContacts } from "../../store/actions/contactsActions"
 
 export class SearchUsers extends Component {
 
@@ -12,9 +13,6 @@ export class SearchUsers extends Component {
     }
   }
 
-  componentDidMount(){
-    console.log(this.props.searchedEmail)
-  }
 
   handleChange = (event) => {
     this.setState({
@@ -22,17 +20,15 @@ export class SearchUsers extends Component {
     })
   }
   handleSubmit = (event) => {
-    console.log('hello submit')
     event.preventDefault()
-    console.log(this.props.searchedEmail)
     this.props.searchUsers(this.state)
 
   }
 
   render() {
     console.log(this.props)
-    const { searchedEmail } = this.props
-    console.log('search result:' , searchedEmail)
+    const { searchedEmail, currentUserInfo, auth } = this.props
+    console.log('search result:' , searchedEmail, auth.email)
     return (
       <div className="">
         <form onSubmit={this.handleSubmit} className="white">
@@ -44,18 +40,24 @@ export class SearchUsers extends Component {
             <button type="submit" className="btn">Search</button>
           </div>
         </form>
-        { searchedEmail && <div>{searchedEmail[0].userName} {searchedEmail[0].email}</div>} 
+        { searchedEmail && <div onClick={() => this.props.addToContacts(searchedEmail, auth.uid)} >{searchedEmail[0].userName} {searchedEmail[0].email}</div>} 
       </div>
     )
   }
 }
+// onClick={() => addToContacts(searchedEmail, auth.email)}
 
 const mapStateToProps = (state) => ({
-  searchedEmail: state.users.searchedEmail
+  searchedEmail: state.users.searchedEmail,
+  auth: state.firebase.auth,
+
+  // currentUserInfo: state.users.userInfo[0]
+
 })
 
 const mapDispatchToProps = dispatch => ({
   searchUsers: (inputEmail) => dispatch(searchUsers(inputEmail)),
+  addToContacts: (searchedEmail, currentUserUid) => dispatch(addToContacts(searchedEmail, currentUserUid))
 
 })
 

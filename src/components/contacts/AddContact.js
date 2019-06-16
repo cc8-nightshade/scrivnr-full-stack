@@ -10,7 +10,7 @@ class AddContact extends Component {
   }
 
   render() {
-    const { users, auth, onlineNow } = this.props;
+    const { users, auth } = this.props;
     if (!auth.uid) {
       return <Redirect to="/signin" />;
     }

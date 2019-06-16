@@ -2,7 +2,7 @@ const intitialState = {
   users: '',
   userInfo: '',
   searchedEmail: null,
-  onlineUsers: ["bob@hot.com", "mike@mic.com", "val@vox.com", "min@boo.com", "unjae@kim.com"]
+  onlineUsers: ["bob@hot.com", "mike@mic.com", "tombonaventure@hotmail.com", "min@boo.com", "unjae@kim.com"]
 }
 
 
@@ -24,8 +24,9 @@ const usersReducer = (state = intitialState, action) => {
       return state
     case 'SEARCH_USERS_ERROR':
       return state
+    default:
+      return state
   }
-  return state
 }
 
 export default usersReducer

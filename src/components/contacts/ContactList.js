@@ -12,11 +12,11 @@ import { Redirect } from "react-router-dom";
 import AddContact from "./AddContact";
 import SearchUsers from "./SearchUsers"
 
-// "redux-firestore": "^1.0.0-alpha.2",
 
 class ContactList extends Component {
   constructor(props) {
     super(props);
+    // to show the form when the button is clicked
     this.clickhandler = this.clickhandler.bind(this);
     this.state = {
       showCreateFrom: false
@@ -46,11 +46,11 @@ class ContactList extends Component {
     }
 
     const { users, auth, contacts, onlineNow } = this.props;
-    console.log('ff', contacts, onlineNow)
 
     if (!auth.uid) {
       return <Redirect to="/signin" />;
     }
+
     return (
       <div className="contact-list container">
         <div className="online-list">
@@ -64,23 +64,25 @@ class ContactList extends Component {
         </div>
         <div>
           CONTACTS ONLINE NOW
+          {/* displays all the contacts online now */}
           {contacts &&
             contacts.map((contact, index) => {
               if(onlineNow.includes(contact.email)){
+                // if you click the name then it will connect with that user by email
                 return <div onClick={() => this.connectWithThisUser(contact.email)} 
                 key={index}>{contact.firstName} {contact.lastName}: {contact.email} </div>;
               }
             })}
         </div>
         {/* <p>{contacts.uid}</p> */}
-        {users &&
+        {/* {users &&
           users.map((contact, index) => {
             return <Contact contactInfo={contact} key={index} />;
           })}
         <button className="btn" onClick={this.clickhandler}>
           Add new contact
         </button>
-        {form}
+        {form} */}
       </div>
     );
   }
