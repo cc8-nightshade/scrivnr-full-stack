@@ -77,7 +77,7 @@ export const addToContacts = (searchedEmail, currentUserUid) => {
       console.log(contactArray)
       console.log(searchedEmail)
       contactArray.push(searchedEmail[0])
-      console.log('contacts action called')
+      console.log('contacts action called', contactArray)
       firestore.collection('users').doc(currentUserUid).update({
       contacts: contactArray
       // firstName: contact.firstName,
