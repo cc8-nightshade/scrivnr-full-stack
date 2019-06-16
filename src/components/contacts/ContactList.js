@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Contact from "./Contact";
-import CreateContact from "./CreateContact";
 import { connect } from "react-redux";
 import {
   getUserInfoByCurrentUser,
@@ -42,7 +41,7 @@ class ContactList extends Component {
   render() {
     let form;
     if (this.state.showCreateFrom) {
-      form = <CreateContact />;
+      // form = <CreateContact />;
     }
 
     const { users, auth, contacts, onlineNow } = this.props;
@@ -71,8 +70,18 @@ class ContactList extends Component {
                 // if you click the name then it will connect with that user by email
                 return <div onClick={() => this.connectWithThisUser(contact.email)} 
                 key={index}>{contact.firstName} {contact.lastName}: {contact.email} </div>;
-              }
+              } 
             })}
+          <dir>
+          CONTACTS OFFLINE 
+          {contacts &&
+            contacts.map((contact, index) => {
+              if(!onlineNow.includes(contact.email)){
+              
+                return <div key={index}>{contact.firstName} {contact.lastName}: {contact.email} </div>;
+              } 
+            })}
+          </dir>
         </div>
         {/* <p>{contacts.uid}</p> */}
         {/* {users &&

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { searchUsers } from "../../store/actions/usersActions";
-import { addToContacts } from "../../store/actions/contactsActions"
+import { addToContacts, deleteContact } from "../../store/actions/contactsActions"
 
 export class SearchUsers extends Component {
 
@@ -57,7 +57,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({
   searchUsers: (inputEmail) => dispatch(searchUsers(inputEmail)),
-  addToContacts: (searchedEmail, currentUserUid) => dispatch(addToContacts(searchedEmail, currentUserUid))
+  addToContacts: (searchedEmail, currentUserUid) => dispatch(addToContacts(searchedEmail, currentUserUid)),
+  deleteContact: (searchedEmail, currentUserUid) => dispatch(deleteContact(searchedEmail, currentUserUid))
 
 })
 
