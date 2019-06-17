@@ -1,14 +1,160 @@
-.alignLeft {
-    text-align: left;
-}
-.alignRight {
-    text-align: right;
+html,
+body {
+  height: 100%;
+  overflow: hidden;
 }
 
+#root,
+.App,
+.App > div,
+.container,
+.row,
+.dialogueList {
+  height: 100%;
+}
+.nav-wrapper{
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+.alignLeft {
+  text-align: left;
+}
+.alignRight {
+  text-align: right;
+}
+.alignCenter {
+  text-align: center;
+}
+.alignRight .textBox {
+  background-color: #dbf8d4;
+}
+.ft-green {
+  color: #2dce8a;
+}
+.name {
+  margin: 0;
+}
+.dialogueList {
+  width: 200px;
+  background: #455dee;
+  color: #fff;
+  overflow-y: auto;
+}
+.dialogueDetail {
+  height: 100%;
+  width: calc(100% - 200px);
+  overflow-y: auto;
+  padding: 10px 30px;
+}
+
+.dialogueDetail .inner{
+    width: 100%;
+    max-width: 600px;
+}
+
+.alignLeft .name {
+  display: none;
+}
+ul.listWrapper {
+    padding-left: 10px;
+}
+.listWrapper li {
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-size: 14px;
+  padding: 10px 0;
+  position: relative;
+  margin-bottom: 0;
+}
+.listWrapper li::after {
+  content: "";
+  border-color: transparent #fff;
+  border-style: solid;
+  border-width: 0.35em 0 0.35em 0.45em;
+  display: block;
+  height: 0;
+  width: 0;
+  right: 10px;
+  top: calc(50% - 3px);
+  position: absolute;
+}
+.listWrapper li.ft-green::after {
+  border-color: transparent #2dce8a;
+}
 .textBox {
-    padding: 10px;
-    border-radius: 10px;
-    display: inline-block;
-    background-color: #d4edf8;
-    max-width: 50%;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #d4edf8;
+  display: inline-block;
+  max-width: 50%;
+}
+.textBox input+span {
+    position: relative;
+    top: 8px;
+}
+.bookmark {
+  margin: 0 auto;
+  padding: 0 6px;
+  border-radius: 10px;
+  display: inline-block;
+  background-color: #dfe1e2;
+  position: relative;
+  top: 11px;
+}
+.borderBottom {
+  border-bottom: 1px dotted #ddd;
+}
+.shortenId {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  position: relative;
+  top: 5px;
+  width: 40px;
+}
+.userName {
+  display: inline-block;
+  width: 50px;
+  overflow: hidden;
+  margin-right: 7px;
+  position: relative;
+  top: -3px;
+}
+.asideHead {
+    font-size: 30px;
+    font-weight: bold;
+    margin: 0;
+    text-align:center;
+    padding: 10px 0;
+}
+.dialogueWrapper{
+    padding-top:56px;
+    display:flex;
+}
+.time {
+  position: relative;
+  top: -8px;
+  display: inline-block;
+  color: #999;
+}
+[type="checkbox"].filled-in:checked + span:not(.lever):after {
+  width: 15px;
+  height: 15px;
+}
+[type="checkbox"] + span:not(.lever) {
+  height: 20px;
+  padding-left: 20px;
+}
+[type="checkbox"].filled-in:not(:checked) + span:not(.lever):after {
+  width: 15px;
+  height: 15px;
+}
+[type="checkbox"].filled-in:checked + span:not(.lever):before {
+  top: -3px;
+  left: -1px;
+}
+[type="checkbox"]:checked ~ .textBox {
+  color: #fff;
 }
