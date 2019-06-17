@@ -4,7 +4,7 @@ body {
   overflow: hidden;
 }
 body{
-    padding-top: 67px;
+    padding-top: 56px;
 }
 
 #root,
@@ -127,13 +127,11 @@ ul.listWrapper {
 }
 .asideHead {
     font-size: 30px;
-    font-weight: bold;
     margin: 0;
     text-align:center;
     padding: 10px 0;
 }
 .dialogueWrapper{
-    padding-top:56px;
     display:flex;
 }
 .time {

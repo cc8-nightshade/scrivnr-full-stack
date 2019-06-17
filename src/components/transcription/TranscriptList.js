@@ -12,7 +12,7 @@ import { isMetaProperty } from "@babel/types";
 class TranscriptList extends Component {
 
   componentDidMount() {
-    this.props.getTranscripts();
+    this.props.getTranscripts(this.props.auth.email);
   }
 
   selectItem = (index) => {
@@ -105,13 +105,14 @@ class TranscriptList extends Component {
 const mapStateToProps = state => {
   return {
     transcripts: state.transcripts.transcripts,
-    transcript: state.transcripts.transcript
+    transcript: state.transcripts.transcript,
+    auth: state.firebase.auth
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    getTranscripts: () => dispatch(getTranscripts()),
+    getTranscripts: (email) => dispatch(getTranscripts(email)),
     setTranscript: item => dispatch(setTranscript(item)),
     toggleQuestionable: (transcript, speechIndex) => dispatch(updateQuestionable(transcript, speechIndex))
   };
