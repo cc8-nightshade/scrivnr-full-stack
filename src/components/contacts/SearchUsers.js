@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { searchUsers } from "../../store/actions/usersActions";
-import { addToContacts, deleteContact } from "../../store/actions/contactsActions"
+import { addToContacts, deleteContact, getContactsByCurrentUser } from "../../store/actions/contactsActions"
 
 export class SearchUsers extends Component {
   constructor(props) {
@@ -23,10 +23,9 @@ export class SearchUsers extends Component {
   }
 
   updateState = (event) => {
-    this.setState({
-      yolo: !this.state.yolo
-    })
-    console.log(this.state.yolo)
+    setTimeout(() => {
+      this.props.getContactsByCurrentUser();
+    }, 500);
   }
 
   render() {
@@ -43,11 +42,12 @@ export class SearchUsers extends Component {
           </div>
         </form>
         { searchedEmail &&
-          <div>
-            <div onClick={() => {this.props.addToContacts(searchedEmail, auth.uid); this.updateState()}} >{searchedEmail[0].userName} {searchedEmail[0].email}
-            </div>
-            <div onClick={() => this.props.deleteContact(searchedEmail[0].email, auth.uid)} >Delete</div>
-          </div>
+          <ul className="collection">
+            <li className="collection-item"  >{searchedEmail[0].userName} {searchedEmail[0].email}
+            <i onClick={() => {this.props.addToContacts(searchedEmail, auth.uid); this.updateState()}} className="secondary-content material-icons">person_add</i>
+            </li>
+            {/* <div onClick={() => this.props.deleteContact(searchedEmail[0].email, auth.uid)} >Delete</div> */}
+          </ul>
         } 
         </div>
       // <div>
@@ -69,7 +69,9 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = dispatch => ({
   searchUsers: (inputEmail) => dispatch(searchUsers(inputEmail)),
   addToContacts: (searchedEmail, currentUserUid) => dispatch(addToContacts(searchedEmail, currentUserUid)),
-  deleteContact: (searchedEmail, currentUserUid) => dispatch(deleteContact(searchedEmail, currentUserUid))
+  deleteContact: (searchedEmail, currentUserUid) => dispatch(deleteContact(searchedEmail, currentUserUid)),
+  getContactsByCurrentUser: () => dispatch(getContactsByCurrentUser()),
+
 
 })
 
