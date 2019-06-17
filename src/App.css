@@ -9,6 +9,13 @@
 
 
 /* VIDEO Component */
+.contact-list {
+  margin-top: 50px;
+}
+
+.secondary-content {
+  padding-left: 20px;
+}
 
 video {
   margin: 0;

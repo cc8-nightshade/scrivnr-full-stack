@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import Contact from "./Contact";
 import { connect } from "react-redux";
-import { compose } from 'react'
-import { firestoreConnect } from 'react-redux-firebase'
+import { compose } from "react";
+import { firestoreConnect } from "react-redux-firebase";
 
 import {
   getUserInfoByCurrentUser,
@@ -10,13 +10,15 @@ import {
   getOnlineUsers,
   searchUsers
 } from "../../store/actions/usersActions";
-import { getContactsByCurrentUser, deleteContact } from "../../store/actions/contactsActions";
+import {
+  getContactsByCurrentUser,
+  deleteContact
+} from "../../store/actions/contactsActions";
 import { Redirect } from "react-router-dom";
 import AddContact from "./AddContact";
-import SearchUsers from "./SearchUsers"
-import io from 'socket.io-client'
-import Recorder from 'opus-recorder';
-
+import SearchUsers from "./SearchUsers";
+import io from "socket.io-client";
+import Recorder from "opus-recorder";
 
 class ContactList extends Component {
   constructor(props) {
@@ -29,7 +31,7 @@ class ContactList extends Component {
       mySocket: undefined,
       myPeerConnection: undefined,
       mediaRecorder: undefined,
-      receiverName: null,
+      receiverName: null
     };
   }
 
@@ -37,17 +39,16 @@ class ContactList extends Component {
     this.props.getUserInfoByCurrentUser();
     this.props.getContactsByCurrentUser();
     this.props.getUsers();
-    this.sendUserInfoToServer()
-
+    this.sendUserInfoToServer();
   }
- 
-  updateState = (event) => {
+
+  updateState = event => {
     setTimeout(() => {
       this.props.getContactsByCurrentUser();
-    }, 500)
+    }, 500);
     //redirects them somewhere
-    this.props.history.push('/contacts')
-  }
+    this.props.history.push("/contacts");
+  };
 
   clickhandler() {
     this.setState({
@@ -56,29 +57,35 @@ class ContactList extends Component {
   }
 
   sendUserInfoToServer = async () => {
-
-     // Initialize Socket
+    // Initialize Socket
     const tempSocket = io.connect();
     // Initialize Socket Details
     {
-      tempSocket.on("message", (messageData) => {
+      tempSocket.on("message", messageData => {
         alert(messageData);
       });
-      tempSocket.on("online-users", (userArray) => {
-        console.log(userArray);
+      tempSocket.on("online-users", userArray => {
+        // Get List From Ian
+        // this.props.getOnlineUsers(onlineUsers)
       });
       tempSocket.on("calling", (callingUser, callingSocket) => {
-        if (window.confirm(`Would you like to accept a call from ${callingUser}?`)) {
+        if (
+          window.confirm(`Would you like to accept a call from ${callingUser}?`)
+        ) {
           console.log("Accepting call");
           this.state.mySocket.emit("accept-call", callingUser, callingSocket);
-        }
-        else { // If the user rejects call
+        } else {
+          // If the user rejects call
           console.log("Rejecting call");
-          this.state.mySocket.emit("reject-call", this.props.auth.email, callingSocket);
+          this.state.mySocket.emit(
+            "reject-call",
+            this.props.auth.email,
+            callingSocket
+          );
           // TODO Destroy recorder!
         }
       });
-      
+
       tempSocket.on("rtc-offer", (callingUser, callingSocket, offerData) => {
         console.log("receiving offer", offerData);
         if (this.state.myPeerConnection === undefined) {
@@ -86,14 +93,14 @@ class ContactList extends Component {
           this.handleOfferMessage(callingUser, callingSocket, offerData);
         }
       });
-      tempSocket.on("reject-call", (receiverName) => {
+      tempSocket.on("reject-call", receiverName => {
         alert(`${receiverName} does not exist or rejected your call.`);
         this.endCall();
       });
-      tempSocket.on("rtc-answer", (answerData) => {
+      tempSocket.on("rtc-answer", answerData => {
         this.handleAnswerMessage(answerData);
       });
-      tempSocket.on("new-ice-candidate", (iceCandidate) => {
+      tempSocket.on("new-ice-candidate", iceCandidate => {
         this.handleNewICECandidateMsg(iceCandidate);
       });
       tempSocket.on("hang-up", () => {
@@ -110,71 +117,74 @@ class ContactList extends Component {
     // this is where get from redux
 
     this.state.mySocket.emit("initialize", this.props.auth.email);
-    // this.state.mySocket.emit("initialize", this.state.myName);
-    this.state.mySocket.on("online-users", (onlineUsers) => {
-      this.props.getOnlineUsers(onlineUsers)
-    })
-  }
+  };
 
-
-  startCall = async () => {
-    const receiverName = prompt('Who do you want to call?', 'Voldemort');
+  startCall = async receiverName => {
+    // const receiverName = prompt('Who do you want to call?', 'Voldemort');
     console.log(receiverName);
     if (receiverName !== "") {
       console.log("Starting a call");
       this.setState({
         receiverName
       });
-      
+
       await this.createPeerConnection();
       console.log("Created caller's connection", this.state.myPeerConnection);
-      
+
       this.setUpOpusRecorder();
       console.log("Created recorder");
-  
-      const mediaConstraints = {audio: true, 
+
+      const mediaConstraints = {
+        audio: true
         // video: true
       };
-      navigator.mediaDevices.getUserMedia(mediaConstraints)
-        .then((localStream) => {
+      navigator.mediaDevices
+        .getUserMedia(mediaConstraints)
+        .then(localStream => {
           document.getElementById("local_video").srcObject = localStream;
-          localStream.getTracks().forEach(track => this.state.myPeerConnection.addTrack(track, localStream));
+          localStream
+            .getTracks()
+            .forEach(track =>
+              this.state.myPeerConnection.addTrack(track, localStream)
+            );
           console.log("Tracks added to connection");
         });
-    } 
-    else { // If they didn't enter any name
+    } else {
+      // If they didn't enter any name
       alert("Please enter a user name");
     }
-  }
-  
+  };
+
   createPeerConnection = async () => {
     let newPeerConnection = await new RTCPeerConnection({
-        iceServers: [{urls: "stun:stun.l.google.com:19302"}]
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
     });
     newPeerConnection.onicecandidate = this.handleICECandidateEvent;
     newPeerConnection.ontrack = this.handleTrackEvent;
     newPeerConnection.onnegotiationneeded = this.handleNegotiationNeededEvent;
-    // Other Things that could be implemented for 
+    // Other Things that could be implemented for
     // state.myPeerConnection.onremovetrack = handleRemoveTrackEvent;
     // state.myPeerConnection.oniceconnectionstatechange = handleICEConnectionStateChangeEvent;
     // state.myPeerConnection.onicegatheringstatechange = handleICEGatheringStateChangeEvent;
     // state.myPeerConnection.onsignalingstatechange = handleSignalingStateChangeEvent;
-    
+
     await this.setState({
       myPeerConnection: newPeerConnection
     });
-  }
-  
+  };
+
   handleNegotiationNeededEvent = async () => {
     // this outer "if" will stop the callee from creating their own offer automatically when they mount their streams
-    if (!this.state.myPeerConnection.remoteDescription && !this.state.myPeerConnection.localDescreption) { 
-      await this.state.myPeerConnection.createOffer()
-        .then((offer) => {
-          this.state.myPeerConnection.setLocalDescription(offer);
-          console.log("Offer created, sending to server:", offer)
-        });
+    if (
+      !this.state.myPeerConnection.remoteDescription &&
+      !this.state.myPeerConnection.localDescreption
+    ) {
+      await this.state.myPeerConnection.createOffer().then(offer => {
+        this.state.myPeerConnection.setLocalDescription(offer);
+        console.log("Offer created, sending to server:", offer);
+      });
       this.state.mySocket.emit(
-        "rtc-offer", 
+        "rtc-offer",
         this.props.auth.email,
         this.state.receiverName,
         {
@@ -183,103 +193,116 @@ class ContactList extends Component {
       );
     }
     // TODO  .catch(reportError);
-  }
-  
-  handleTrackEvent = (event) => {
+  };
+
+  handleTrackEvent = event => {
     console.log("Handling track event (incoming answer)");
     document.getElementById("received_video").srcObject = event.streams[0];
-  }
-  
+  };
+
   handleOfferMessage = async (callerName, callerSocket, offerData) => {
     // Check to see if they accept, and only continue setting up connection if yes
     console.log("session description receiving", offerData.sdp);
-    
+
     if (window.confirm(`Would you like to accept a call from ${callerName}?`)) {
       await this.createPeerConnection();
       await this.state.myPeerConnection.setRemoteDescription(offerData.sdp);
       await this.setUpOpusRecorder();
 
-      let mediaConstraints = {audio: true, 
+      let mediaConstraints = {
+        audio: true
         // video: true
       };
-      await navigator.mediaDevices.getUserMedia(mediaConstraints)
-        .then((localStream) => {
+      await navigator.mediaDevices
+        .getUserMedia(mediaConstraints)
+        .then(localStream => {
           document.getElementById("local_video").srcObject = localStream;
-          localStream.getTracks().forEach(track => this.state.myPeerConnection.addTrack(track, localStream));
+          localStream
+            .getTracks()
+            .forEach(track =>
+              this.state.myPeerConnection.addTrack(track, localStream)
+            );
           this.state.mediaRecorder.start(localStream);
         });
-      await this.state.myPeerConnection.createAnswer()
-        .then((answer) => {
-          this.state.myPeerConnection.setLocalDescription(answer);
-        });
-      console.log("Answer created and sending:", this.state.myPeerConnection.localDescription)
-      this.state.mySocket.emit(
-        "rtc-answer", 
-        callerSocket, 
-        {sdp: this.state.myPeerConnection.localDescription}
+      await this.state.myPeerConnection.createAnswer().then(answer => {
+        this.state.myPeerConnection.setLocalDescription(answer);
+      });
+      console.log(
+        "Answer created and sending:",
+        this.state.myPeerConnection.localDescription
       );
-    } 
-    else { // If the user rejects call
-      this.state.mySocket.emit("reject-call", this.props.auth.email, callerSocket);
+      this.state.mySocket.emit("rtc-answer", callerSocket, {
+        sdp: this.state.myPeerConnection.localDescription
+      });
+    } else {
+      // If the user rejects call
+      this.state.mySocket.emit(
+        "reject-call",
+        this.props.auth.email,
+        callerSocket
+      );
       this.resetMyPeerConnection();
       // TODO Destroy recorder!
     }
-  }
-  
-  handleAnswerMessage = (answerData) => {
-    const mediaConstraints = {audio: true, 
+  };
+
+  handleAnswerMessage = answerData => {
+    const mediaConstraints = {
+      audio: true
       // video: true
     };
-    navigator.mediaDevices.getUserMedia(mediaConstraints)
-      .then((localStream) => {
-        this.state.mediaRecorder.start(localStream);
-        console.log("Started Recording");
-      });
+    navigator.mediaDevices.getUserMedia(mediaConstraints).then(localStream => {
+      this.state.mediaRecorder.start(localStream);
+      console.log("Started Recording");
+    });
     console.log("handling answer", answerData.sdp);
-    this.state.myPeerConnection.setRemoteDescription(answerData.sdp)
+    this.state.myPeerConnection
+      .setRemoteDescription(answerData.sdp)
       .then(() => {
-        console.log("processed answer successfully")
+        console.log("processed answer successfully");
       })
-      .catch((err) => console.log("error handling answer", err));
-  }
-  
-  handleICECandidateEvent = (event) => {
+      .catch(err => console.log("error handling answer", err));
+  };
+
+  handleICECandidateEvent = event => {
     console.log("sending new ICE candidate");
     if (event.candidate) {
       this.state.mySocket.emit("new-ice-candidate", {
         candidate: event.candidate
       });
     }
-  }
-  
-  handleNewICECandidateMsg = (msg) => {
+  };
+
+  handleNewICECandidateMsg = msg => {
     console.log("receiving and processing new ICE candidate");
     const candidate = new RTCIceCandidate(msg.candidate);
     this.state.myPeerConnection.addIceCandidate(candidate);
-      // TODO .catch(reportError);
-  }
+    // TODO .catch(reportError);
+  };
 
-    // ENDING OF CALLS
+  // ENDING OF CALLS
   hangUpCall = () => {
     console.log("Hanging up call");
     this.state.mySocket.emit("hang-up");
     this.endCall();
-  }
+  };
 
-  // Refactored out of hangUpCall because it needs to be run when the other party hangs up  
+  // Refactored out of hangUpCall because it needs to be run when the other party hangs up
   endCall = () => {
-    console.log("Shutting down call.")
+    console.log("Shutting down call.");
     if (this.state.mediaRecorder) {
       console.log("Going to send message to server");
       this.state.mediaRecorder.stop();
-      setTimeout(() => {this.state.mySocket.emit("end-recording");}, 3000);
+      setTimeout(() => {
+        this.state.mySocket.emit("end-recording");
+      }, 3000);
     }
     this.resetMyPeerConnection();
     this.setState({
       mediaRecorder: null
     });
     // TODO - Change color of buttons etc based on call status
-  }
+  };
 
   setUpOpusRecorder = async () => {
     let recorderConfig = {
@@ -288,21 +311,23 @@ class ContactList extends Component {
       streamPages: true,
       originalSampleRateOverride: 48000
     };
-    let rec = new Recorder (recorderConfig);
-    rec.ondataavailable = (arrayBuffer) => {
+    let rec = new Recorder(recorderConfig);
+    rec.ondataavailable = arrayBuffer => {
       this.state.mySocket.emit("send-blob", this.bufferToBase64(arrayBuffer));
     };
-    rec.onstart = () => {console.log("recorder started")};
+    rec.onstart = () => {
+      console.log("recorder started");
+    };
     await this.setState({
       mediaRecorder: rec
     });
-  }
+  };
 
   // Utility for setUpOpusRecorder to change buffer to base64
-  bufferToBase64 = (buf) => {
-    let binstr = buf.map(char => String.fromCharCode(char)).join('');
+  bufferToBase64 = buf => {
+    let binstr = buf.map(char => String.fromCharCode(char)).join("");
     return btoa(binstr);
-  } 
+  };
 
   resetMyPeerConnection = async () => {
     if (this.state.myPeerConnection) {
@@ -315,7 +340,7 @@ class ContactList extends Component {
       this.state.myPeerConnection.onsignalingstatechange = null;
       this.state.myPeerConnection.onicegatheringstatechange = null;
       this.state.myPeerConnection.onnegotiationneeded = null;
-      
+
       // stopping tracks, resetting HTML
       const remoteVideo = document.getElementById("received_video");
       const localVideo = document.getElementById("local_video");
@@ -336,9 +361,11 @@ class ContactList extends Component {
         myPeerConnection: undefined
       });
     }
+  };
+
+  bookmarkBtn() {
+    this.state.mySocket.emit("bookmark");
   }
-
-
 
   render() {
     let form;
@@ -351,45 +378,100 @@ class ContactList extends Component {
     }
     // console.log(firebase.setListener('users'))
     return (
-      <div className="contact-list container">
-        <div className="online-list">
-         {/* {onlineNow} */}
-        </div>
-        <div className="search-users">
-          {/* <SearchUsers></SearchUsers> */}
-        </div>
-        <div className="user-list">
-        {this.state.yolo}
-          {/* <AddContact></AddContact> */}
-        </div>
-        <div>
-          CONTACTS ONLINE NOW
-          {/* displays all the contacts online now */}
-          {contacts &&
-            contacts.map((contact, index) => {
-              if(onlineNow.includes(contact.email)){
-                // if you click the name then it will connect with that user by email
-                return (
-                  <div key={index}>
-                    <div onClick={() => this.connectWithThisUser(contact.email)} 
-                    >{contact.firstName} {contact.lastName}: {contact.email} </div>
-                    <div onClick={() => {this.props.deleteContact(contact.email, auth.uid);this.updateState()}}>Delete</div>
-                  </div>
+      <div className="contact-video wrapper">
+        {/* CONTACTS START */}
+        <div className="contact-list container">
+          <div className="search-users">
+            <SearchUsers />
+          </div>
 
-                )} 
-            })}
-          <dir>
-          CONTACTS OFFLINE 
-          {contacts &&
-            contacts.map((contact, index) => {
-              if(!onlineNow.includes(contact.email)){      
-              return (
-                <div key={index}>
-                  <div>{contact.firstName} {contact.lastName}: {contact.email} </div>
-                  <div onClick={() => {this.props.deleteContact(contact.email, auth.uid);this.updateState()}}>Delete</div>
-                </div>)} 
-            })}
-          </dir>
+          <div>
+            <ul className="collection with-header">
+              <li class="collection-header">
+                <h5>Online Now</h5>
+              </li>
+
+              {/* displays all the contacts online now */}
+              {contacts &&
+                contacts.map((contact, index) => {
+                  if (onlineNow.includes(contact.email)) {
+                    // if you click the name then it will connect with that user by email
+                    return (
+                      <li key={index} className="collection-item">
+                        {contact.firstName} {contact.lastName}: {contact.email}
+                        <i
+                          className="secondary-content material-icons"
+                          onClick={() => this.startCall()}
+                        >
+                          send
+                        </i>
+                        <i
+                          className="secondary-content material-icons"
+                          onClick={() => {
+                            this.props.deleteContact(contact.email, auth.uid);
+                            this.updateState();
+                          }}
+                        >
+                          delete
+                        </i>{" "}
+                      </li>
+                      // <div onClick={() => {this.props.deleteContact(contact.email, auth.uid);this.updateState()}}>Delete</div>
+                    );
+                  }
+                })}
+            </ul>
+
+            <ul className="collection with-header">
+              <li class="collection-header">
+                <h5>Offline</h5>
+              </li>
+              {contacts &&
+                contacts.map((contact, index) => {
+                  if (!onlineNow.includes(contact.email)) {
+                    return (
+                      <li key={index} className="collection-item">
+                        {contact.firstName} {contact.lastName}: {contact.email}
+                        <i
+                          className="secondary-content material-icons"
+                          onClick={() => {
+                            this.props.deleteContact(contact.email, auth.uid);
+                            this.updateState();
+                          }}
+                        >
+                          delete
+                        </i>{" "}
+                      </li>
+                    );
+                  }
+                })}
+            </ul>
+          </div>
+          {/* CONTACTS ENDS */}
+
+          <div className=" ">
+            {/* <div onClick={this.initialConnect}>Click me to connect to socket.io</div> */}
+            <div className="camera-box">
+              <video id="received_video" autoPlay />
+              <video id="local_video" autoPlay muted />
+            </div>
+          </div>
+        
+
+          <div className="">
+            <button onClick={() => this.startCall()} className="">
+              Start Chat
+            </button>
+            {/* <button onClick={this.acceptCall} className="waves-effect waves-light btn-large">Accept Call</button> */}
+            <button id="hangup-button" className="" onClick={this.hangUpCall}>
+              Hang Up
+            </button>
+            <button id="record" onClick={this.startRecording}>
+              record
+            </button>
+            <button id="stop-recording" onClick={this.stopRecording}>
+              Stop
+            </button>
+          </div>
         </div>
         {/* <p>{contacts.uid}</p> */}
         {/* {users &&
@@ -400,27 +482,6 @@ class ContactList extends Component {
           Add new contact
         </button>
         {form} */}
-        <div className=" ">
-        {/* <div onClick={this.initialConnect}>Click me to connect to socket.io</div> */}
-          <div className="camera-box">
-            <video id="received_video" autoPlay></video>
-            <video id="local_video" autoPlay muted></video>
-          </div>
-          
-        </div>
-        <div className="">
-          <button onClick={this.startCall} className="">Start Chat</button>
-          {/* <button onClick={this.acceptCall} className="waves-effect waves-light btn-large">Accept Call</button> */}
-          <button id="hangup-button" className="" onClick={this.hangUpCall}>
-            Hang Up
-          </button>
-          <button id="record" onClick={this.startRecording}>
-            record
-          </button>
-          <button id="stop-recording" onClick={this.stopRecording}>
-            Stop
-          </button>
-        </div>
       </div>
     );
   }
@@ -441,8 +502,9 @@ const mapDispatchToProps = dispatch => {
     getUserInfoByCurrentUser: () => dispatch(getUserInfoByCurrentUser()),
     getContactsByCurrentUser: () => dispatch(getContactsByCurrentUser()),
     getUsers: () => dispatch(getUsers()),
-    getOnlineUsers: (onlineUsers) => dispatch(getOnlineUsers(onlineUsers)),
-    deleteContact: (searchedEmail, currentUserUid) => dispatch(deleteContact(searchedEmail, currentUserUid))
+    getOnlineUsers: onlineUsers => dispatch(getOnlineUsers(onlineUsers)),
+    deleteContact: (searchedEmail, currentUserUid) =>
+      dispatch(deleteContact(searchedEmail, currentUserUid))
   };
 };
 
@@ -456,4 +518,3 @@ export default connect(
 //   connect(mapStateToProps,
 //       mapDispatchToProps)
 // )(ContactList)
-

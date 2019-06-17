@@ -32,7 +32,7 @@ export class SearchUsers extends Component {
   render() {
     const { searchedEmail, auth } = this.props
     return (
-      <div className="container">
+      <div className="">
         <form onSubmit={this.handleSubmit} className="white">
           <div>
             <label htmlFor='number'>Search by Email</label>
