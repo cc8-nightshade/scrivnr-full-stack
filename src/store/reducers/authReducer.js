@@ -3,6 +3,7 @@ const intitialState = {
   userName: '',
   email: '',
   password: '',
+  uid:''
 
 }
 

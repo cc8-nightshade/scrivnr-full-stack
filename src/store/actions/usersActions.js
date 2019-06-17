@@ -17,6 +17,14 @@ export const getUsers = () => {
 
   };
 };
+
+export const getOnlineUsers = (onlineUsers) => {
+  return (dispatch, getState) => {
+    dispatch({ type: "ONLINE_USERS", onlineUsers });
+  };
+};
+
+
 export const searchUsers = (input) => {
   return (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore()
