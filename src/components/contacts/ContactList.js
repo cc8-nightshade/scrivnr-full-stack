@@ -116,20 +116,19 @@ class ContactList extends Component {
     })
   }
 
-
   startCall = async () => {
     const receiverName = prompt('Who do you want to call?', 'Voldemort');
     console.log(receiverName);
-    if (receiverName !== "") {
+    if (receiverName !== "" && receiverName !== null) {
       console.log("Starting a call");
       this.setState({
         receiverName
       });
       
-      await this.createPeerConnection();
+      this.createPeerConnection();
       console.log("Created caller's connection", this.state.myPeerConnection);
       
-      this.setUpOpusRecorder();
+      await this.setUpOpusRecorder();
       console.log("Created recorder");
   
       const mediaConstraints = {audio: true, 
@@ -137,8 +136,12 @@ class ContactList extends Component {
       };
       navigator.mediaDevices.getUserMedia(mediaConstraints)
         .then((localStream) => {
-          document.getElementById("local_video").srcObject = localStream;
+          //document.getElementById("local_video").srcObject = localStream;
           localStream.getTracks().forEach(track => this.state.myPeerConnection.addTrack(track, localStream));
+          this.state.mediaRecorder.start(localStream);
+          // this.setState({
+          //   myStream: localStream
+          // });
           console.log("Tracks added to connection");
         });
     } 
@@ -187,14 +190,16 @@ class ContactList extends Component {
   
   handleTrackEvent = (event) => {
     console.log("Handling track event (incoming answer)");
+    console.log("These are the streams received", event.streams);
     document.getElementById("received_video").srcObject = event.streams[0];
   }
   
   handleOfferMessage = async (callerName, callerSocket, offerData) => {
     // Check to see if they accept, and only continue setting up connection if yes
     console.log("session description receiving", offerData.sdp);
-    
-    if (window.confirm(`Would you like to accept a call from ${callerName}?`)) {
+    // confirmation moved to different place
+    // if (window.confirm(`Would you like to accept a call from ${callerName}?`)) {
+
       await this.createPeerConnection();
       await this.state.myPeerConnection.setRemoteDescription(offerData.sdp);
       await this.setUpOpusRecorder();
@@ -218,24 +223,33 @@ class ContactList extends Component {
         callerSocket, 
         {sdp: this.state.myPeerConnection.localDescription}
       );
-    } 
-    else { // If the user rejects call
-      this.state.mySocket.emit("reject-call", this.props.auth.email, callerSocket);
-      this.resetMyPeerConnection();
-      // TODO Destroy recorder!
-    }
+      // Confirmation logic moved elsewhere
+    // } 
+    // else { // If the user rejects call
+    //   this.state.mySocket.emit("reject-call", this.state.myName, callerSocket);
+    //   this.resetMyPeerConnection();
+    //   // TODO Destroy recorder!
+    // }
   }
   
-  handleAnswerMessage = (answerData) => {
-    const mediaConstraints = {audio: true, 
-      // video: true
-    };
-    navigator.mediaDevices.getUserMedia(mediaConstraints)
-      .then((localStream) => {
-        this.state.mediaRecorder.start(localStream);
-        console.log("Started Recording");
-      });
+  handleAnswerMessage = async (answerData) => {
+    // const mediaConstraints = {audio: true, 
+    //   // // video: true
+    // };
+    // navigator.mediaDevices.getUserMedia(mediaConstraints)
+    //   .then((localStream) => {
+    //     this.state.mediaRecorder.start(localStream);
+    //     console.log("Started Recording");
+    //   });
+    
+    
+    //this.state.mySocket.emit("reset-recording");
     console.log("handling answer", answerData.sdp);
+    
+    // REALLY ONLY WANT TO START RECORDING ON ANSWER, BUT NOT WORKING???
+    // this.state.mediaRecorder.start(this.state.myStream);
+    
+    console.log("started caller's recording");
     this.state.myPeerConnection.setRemoteDescription(answerData.sdp)
       .then(() => {
         console.log("processed answer successfully")
@@ -270,9 +284,8 @@ class ContactList extends Component {
   endCall = () => {
     console.log("Shutting down call.")
     if (this.state.mediaRecorder) {
-      console.log("Going to send message to server");
       this.state.mediaRecorder.stop();
-      setTimeout(() => {this.state.mySocket.emit("end-recording");}, 3000);
+      setTimeout(() => {this.state.mySocket.emit("end-recording");}, 2000);
     }
     this.resetMyPeerConnection();
     this.setState({
@@ -300,7 +313,9 @@ class ContactList extends Component {
 
   // Utility for setUpOpusRecorder to change buffer to base64
   bufferToBase64 = (buf) => {
-    let binstr = buf.map(char => String.fromCharCode(char)).join('');
+    let binstr = Array.prototype.map.call(buf, function (ch) {
+        return String.fromCharCode(ch);
+    }).join('');
     return btoa(binstr);
   } 
 
