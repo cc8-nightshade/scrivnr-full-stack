@@ -9,6 +9,10 @@
 
 
 /* VIDEO Component */
+.contact-video {
+  display: flex;
+  
+}
 .contact-list {
   margin-top: 50px;
 }

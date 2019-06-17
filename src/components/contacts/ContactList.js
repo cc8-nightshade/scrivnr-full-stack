@@ -402,7 +402,7 @@ class ContactList extends Component {
     }
     // console.log(firebase.setListener('users'))
     return (
-      <div className="contact-video wrapper">
+      <div className="contact-video wrapper container">
         {/* CONTACTS START */}
         <div className="contact-list container">
           <div className="search-users">
@@ -425,7 +425,7 @@ class ContactList extends Component {
                         {contact.firstName} {contact.lastName}: {contact.email}
                         <i
                           className="secondary-content material-icons"
-                          onClick={() => this.startCall()}
+                          onClick={() => this.startCall(contact.email)}
                         >
                           send
                         </i>
@@ -470,8 +470,11 @@ class ContactList extends Component {
                 })}
             </ul>
           </div>
-          {/* CONTACTS ENDS */}
+        </div>
 
+
+        {/* CONTACTS ENDS */}
+        {/* <p>{contacts.uid}</p> */}
           <div className=" ">
             {/* <div onClick={this.initialConnect}>Click me to connect to socket.io</div> */}
             <div className="camera-box">
@@ -496,8 +499,6 @@ class ContactList extends Component {
               Stop
             </button>
           </div>
-        </div>
-        {/* <p>{contacts.uid}</p> */}
         {/* {users &&
           users.map((contact, index) => {
             return <Contact contactInfo={contact} key={index} />;
