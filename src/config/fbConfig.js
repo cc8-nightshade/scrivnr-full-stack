@@ -25,7 +25,7 @@ let minConfig = {
 }
 
 // Initialize Firebase
-firebase.initializeApp(minConfig);
+firebase.initializeApp(fbConfig);
 // firebase.firestore().settings({ timestampsInSnapshots: true })
 
 export default firebase

@@ -3,6 +3,9 @@ body {
   height: 100%;
   overflow: hidden;
 }
+body{
+    padding-top: 67px;
+}
 
 #root,
 .App,
