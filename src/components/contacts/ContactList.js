@@ -457,6 +457,9 @@ class ContactList extends Component {
                     return (
                       <li key={index} className="collection-item">
                         {contact.firstName} {contact.lastName}
+                        <i className="secondary-content material-icons">
+                          not_interested
+                        </i>
                         <i
                           className="secondary-content material-icons"
                           onClick={() => {

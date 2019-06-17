@@ -2,7 +2,7 @@ const intitialState = {
   users: '',
   userInfo: '',
   searchedEmail: null,
-  onlineUsers: ["bob@bob.com", "ian@ian.com", "tombonaventure@hotmail.com", "mollky@mol.com", "unjae@kim.com"]
+  onlineUsers: ["bob@bob.com", "ian@ian.com", "mollky@mol.com", "unjae@kim.com"]
 }
 
 
