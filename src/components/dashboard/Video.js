@@ -6,7 +6,6 @@ export default class Video extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      myName: '',
       mySocket: undefined,
       myPeerConnection: undefined,
       mediaRecorder: undefined,
@@ -20,7 +19,8 @@ export default class Video extends Component {
 
   initialConnect = async () => {
     // Get user's name and set it to state.
-    let myName = prompt("Please enter your name", "Harry Potter");
+    // let myName = prompt("Please enter your name", "Harry Potter");
+    let myName = 'x'
     await this.setState({myName});
 
     // Initialize Socket
