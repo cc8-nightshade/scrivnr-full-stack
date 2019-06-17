@@ -1,26 +1,57 @@
-export const getTranscripts = () => {
+export const getTranscripts = (email) => {
   return (dispatch, getState, { getFirestore }) => {
-    const firestore = getFirestore()
-    firestore.collection("dialogues")
-    .orderBy('startDateTime', 'desc')
-    .get()
-    .then(querySnapshot => {
+    const firestore = getFirestore();
+    Promise.all([
+      firestore.collection("dialogues")
+      .where("caller", "==", email)
+      .get(),
+      firestore.collection("dialogues")
+      .where("receiver", "==", email)
+      .get()
+    ])
+    .then(results => {
+      console.log(results);
       let transcriptsArray = [];
-        querySnapshot.forEach(doc => {
-          const data = doc.data();
-          transcriptsArray.push({
-            caller: data.caller,
-            receiver: data.receiver,
-            speech: data.speech,
-            startDate: data.startDateTime,
-            id: doc.id
-          });
+      results.forEach(result => {
+          result.forEach(doc => {
+            const data = doc.data();
+            transcriptsArray.push({
+              caller: data.caller,
+              receiver: data.receiver,
+              speech: data.speech,
+              startDate: data.startDateTime,
+              id: doc.id
+            });
+          })
         });
+        transcriptsArray.sort((a, b) => b.startDate.toDate() - a.startDate.toDate());
       dispatch({ type: "transcripts/GET_TRANSCRIPTS", transcriptsArray });
+
     })
     .catch((err) => {
       dispatch({ type: "transcripts/GET_TRANSCRIPTS_ERROR", err})
     })
+
+    // firestore.collection("dialogues")
+    // .where("caller", "==", email)
+    // .get()
+    // .then(querySnapshot => {
+    //   let transcriptsArray = [];
+    //     querySnapshot.forEach(doc => {
+    //       const data = doc.data();
+    //       transcriptsArray.push({
+    //         caller: data.caller,
+    //         receiver: data.receiver,
+    //         speech: data.speech,
+    //         startDate: data.startDateTime,
+    //         id: doc.id
+    //       });
+    //     });
+    //   dispatch({ type: "transcripts/GET_TRANSCRIPTS", transcriptsArray });
+    // })
+    // .catch((err) => {
+    //   dispatch({ type: "transcripts/GET_TRANSCRIPTS_ERROR", err})
+    // })
   };
 };
 

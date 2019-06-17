@@ -4,7 +4,7 @@ body {
   overflow: hidden;
 }
 body{
-    padding-top: 67px;
+    padding-top: 56px;
 }
 
 #root,
@@ -133,7 +133,6 @@ ul.listWrapper {
     padding: 10px 0;
 }
 .dialogueWrapper{
-    padding-top:56px;
     display:flex;
 }
 .time {
