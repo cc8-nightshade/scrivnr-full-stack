@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { signOut } from '../../store/actions/authActions'
@@ -7,11 +7,12 @@ const SignedInLinks = (props) => {
   return (
     <div>
       <ul className="right">
-        <li>{props.profile.userName}</li>
+        <li>{props.profile.firstName}</li>
         <li><NavLink to='/transcripts'>Transcripts</NavLink></li>
+        <li><NavLink to='/search'>Search for People</NavLink></li>
         <li><NavLink to='/contacts'>Contacts</NavLink></li>
-        <li><a onClick={props.signOut}>Log Out</a></li>
-        <li><NavLink to='/account' className="btn btn-floating pink lighten-1">IC</NavLink></li>
+        <li><p onClick={props.signOut}>Log Out</p></li>
+        {/* <li><NavLink to='/account' className="btn btn-floating pink lighten-1">IC</NavLink></li> */}
       </ul>
     </div>
   )

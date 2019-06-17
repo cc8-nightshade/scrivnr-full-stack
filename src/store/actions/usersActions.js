@@ -2,7 +2,6 @@ export const getUsers = () => {
   return (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore()
     const profile = getState().firebase.profile
-    const userID = getState().firebase.auth.uid // later for mapping userid to contacts
     // onSnapshot - try to implement for auto-updating
     firestore.collection('users').get().then(querySnapshot => {
       let userArray = []
@@ -29,8 +28,6 @@ export const searchUsers = (input) => {
         console.log(doc.id)
         searchedEmail.push(doc.data())
       });
-      console.log('serchedUser:', searchedEmail)
-
       dispatch({ type: "SEARCH_USERS", searchedEmail }
       );
     })

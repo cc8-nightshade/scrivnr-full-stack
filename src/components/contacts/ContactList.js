@@ -1,12 +1,15 @@
 import React, { Component } from "react";
 import Contact from "./Contact";
 import { connect } from "react-redux";
+import { compose } from 'react'
+import { firestoreConnect } from 'react-redux-firebase'
+
 import {
   getUserInfoByCurrentUser,
   getUsers,
   searchUsers
 } from "../../store/actions/usersActions";
-import { getContactsByCurrentUser } from "../../store/actions/contactsActions";
+import { getContactsByCurrentUser, deleteContact } from "../../store/actions/contactsActions";
 import { Redirect } from "react-router-dom";
 import AddContact from "./AddContact";
 import SearchUsers from "./SearchUsers"
@@ -18,7 +21,8 @@ class ContactList extends Component {
     // to show the form when the button is clicked
     this.clickhandler = this.clickhandler.bind(this);
     this.state = {
-      showCreateFrom: false
+      showCreateForm: false,
+      yolo: true
     };
   }
 
@@ -26,11 +30,20 @@ class ContactList extends Component {
     this.props.getUserInfoByCurrentUser();
     this.props.getContactsByCurrentUser();
     this.props.getUsers();
+
+  }
+ 
+  updateState = (event) => {
+    setTimeout(() => {
+      this.props.getContactsByCurrentUser();
+    }, 500)
+    //redirects them somewhere
+    this.props.history.push('/contacts')
   }
 
   clickhandler() {
     this.setState({
-      showCreateFrom: !this.state.showCreateFrom
+      showCreateForm: !this.state.showCreateForm
     });
   }
 
@@ -40,25 +53,25 @@ class ContactList extends Component {
 
   render() {
     let form;
-    if (this.state.showCreateFrom) {
+    if (this.state.showCreateForm) {
       // form = <CreateContact />;
     }
 
-    const { users, auth, contacts, onlineNow } = this.props;
-
+    const { auth, contacts, onlineNow } = this.props;
     if (!auth.uid) {
       return <Redirect to="/signin" />;
     }
-
+    // console.log(firebase.setListener('users'))
     return (
       <div className="contact-list container">
         <div className="online-list">
          {/* {onlineNow} */}
         </div>
         <div className="search-users">
-          <SearchUsers></SearchUsers>
+          {/* <SearchUsers></SearchUsers> */}
         </div>
         <div className="user-list">
+        {this.state.yolo}
           {/* <AddContact></AddContact> */}
         </div>
         <div>
@@ -68,18 +81,25 @@ class ContactList extends Component {
             contacts.map((contact, index) => {
               if(onlineNow.includes(contact.email)){
                 // if you click the name then it will connect with that user by email
-                return <div onClick={() => this.connectWithThisUser(contact.email)} 
-                key={index}>{contact.firstName} {contact.lastName}: {contact.email} </div>;
-              } 
+                return (
+                  <div key={index}>
+                    <div onClick={() => this.connectWithThisUser(contact.email)} 
+                    >{contact.firstName} {contact.lastName}: {contact.email} </div>
+                    <div onClick={() => {this.props.deleteContact(contact.email, auth.uid);this.updateState()}}>Delete</div>
+                  </div>
+
+                )} 
             })}
           <dir>
           CONTACTS OFFLINE 
           {contacts &&
             contacts.map((contact, index) => {
-              if(!onlineNow.includes(contact.email)){
-              
-                return <div key={index}>{contact.firstName} {contact.lastName}: {contact.email} </div>;
-              } 
+              if(!onlineNow.includes(contact.email)){      
+              return (
+                <div key={index}>
+                  <div>{contact.firstName} {contact.lastName}: {contact.email} </div>
+                  <div onClick={() => {this.props.deleteContact(contact.email, auth.uid);this.updateState()}}>Delete</div>
+                </div>)} 
             })}
           </dir>
         </div>
@@ -112,6 +132,7 @@ const mapDispatchToProps = dispatch => {
     getUserInfoByCurrentUser: () => dispatch(getUserInfoByCurrentUser()),
     getContactsByCurrentUser: () => dispatch(getContactsByCurrentUser()),
     getUsers: () => dispatch(getUsers()),
+    deleteContact: (searchedEmail, currentUserUid) => dispatch(deleteContact(searchedEmail, currentUserUid))
   };
 };
 
@@ -119,4 +140,10 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(ContactList);
+
+// export default compose(
+//   firestoreConnect([{ collection: 'users' }]), // or { collection: 'todos' }
+//   connect(mapStateToProps,
+//       mapDispatchToProps)
+// )(ContactList)
 

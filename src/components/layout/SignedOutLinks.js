@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
 const SignedOutLinks = () => {
   return (
@@ -7,7 +7,7 @@ const SignedOutLinks = () => {
     <div>
       
         <div className="">
-          <a href="#" data-target="mobile-demo" className="sidenav-trigger"><i className="material-icons">menu</i></a>
+          <a href="/#" data-target="mobile-demo" className="sidenav-trigger"><i className="material-icons">menu</i></a>
           <ul className="right hide-on-med-and-down">
 
             <li><NavLink to='/contacts'>Contacts</NavLink></li>

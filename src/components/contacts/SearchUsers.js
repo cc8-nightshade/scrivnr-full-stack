@@ -1,19 +1,10 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { searchUsers } from "../../store/actions/usersActions";
 import { addToContacts, deleteContact } from "../../store/actions/contactsActions"
 
 export class SearchUsers extends Component {
-
-  constructor(props){
-    super(props);
-    this.state = {
-
-    }
-  }
-
-
+  
   handleChange = (event) => {
     this.setState({
       [event.target.id]: event.target.value
@@ -25,12 +16,17 @@ export class SearchUsers extends Component {
 
   }
 
+  updateState = (event) => {
+    this.setState({
+      yolo: !this.state.yolo
+    })
+    console.log(this.state.yolo)
+  }
+
   render() {
-    console.log(this.props)
-    const { searchedEmail, currentUserInfo, auth } = this.props
-    console.log('search result:' , searchedEmail, auth.email)
+    const { searchedEmail, auth } = this.props
     return (
-      <div className="">
+      <div className="container">
         <form onSubmit={this.handleSubmit} className="white">
           <div>
             <label htmlFor='number'>Search by Email</label>
@@ -40,8 +36,17 @@ export class SearchUsers extends Component {
             <button type="submit" className="btn">Search</button>
           </div>
         </form>
-        { searchedEmail && <div onClick={() => this.props.addToContacts(searchedEmail, auth.uid)} >{searchedEmail[0].userName} {searchedEmail[0].email}</div>} 
-      </div>
+        { searchedEmail &&
+          <div>
+            <div onClick={() => {this.props.addToContacts(searchedEmail, auth.uid); this.updateState()}} >{searchedEmail[0].userName} {searchedEmail[0].email}
+            </div>
+            <div onClick={() => this.props.deleteContact(searchedEmail[0].email, auth.uid)} >Delete</div>
+          </div>
+        } 
+        </div>
+      // <div>
+      //   <div onClick={() => this.props.deleteContact(searchedEmail, auth.uid)} >Delete</div>
+      // </div>
     )
   }
 }

@@ -7,6 +7,7 @@ import Video from "./components/dashboard/Video";
 import SignIn from "./components/auth/SignIn";
 import SignUp from "./components/auth/SignUp";
 import SignUpV from "./components/auth/SignUpV"
+import SearchUsers from "./components/contacts/SearchUsers"
 
 import "./App.css";
 
@@ -23,6 +24,8 @@ class App extends Component {
             <Route path="/signin" component={SignIn} />
             <Route path="/signup" component={SignUp} />
             <Route path="/signupv" component={SignUpV} />
+            <Route path="/search" component={SearchUsers} />
+
           </Switch>
         </div>
       </BrowserRouter>

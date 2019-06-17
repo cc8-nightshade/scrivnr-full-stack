@@ -56,17 +56,13 @@ export const addToContacts = (searchedEmail, currentUserUid) => {
       return contactArray
     })
     .then((contactArray) => {
-      console.log(contactArray)
-      console.log(searchedEmail)
       contactArray.push(searchedEmail[0])
-      console.log('contacts action called', contactArray)
       firestore.collection('users').doc(currentUserUid).update({
       contacts: contactArray
       })
     })
     .then(() => 
     {
-      console.log('dispatch called')
       dispatch({ type: "ADD_CONTACT" }
       );
     }).catch((err) => {
@@ -90,17 +86,19 @@ export const deleteContact = (searchedEmail, currentUserUid) => {
       return contactArray
     })
     .then((contactArray) => {
-      const filteredArray = contactArray.filter(contact => contact.email !== searchedEmail[0].email)
+      const filteredArray = contactArray.filter(contact => contact.email !== searchedEmail)
       firestore.collection('users').doc(currentUserUid).update({
       contacts: filteredArray
       })
-    })
-    .then(() => 
-    {
+      // return filteredArray
       console.log('dispatch called')
-      dispatch({ type: "DELETE_CONTACT" }
+      dispatch({ type: "DELETE_CONTACT", filteredArray }
       );
-    }).catch((err) => {
+    })
+    // .then((filteredArray) => 
+    // {
+    // })
+    .catch((err) => {
       dispatch({ type: "DELETE_CONTACT_ERROR", err})
     })
 

@@ -20,7 +20,6 @@ const usersReducer = (state = intitialState, action) => {
       return state
     case 'SEARCH_USERS':
       state.searchedEmail = action.searchedEmail
-      console.log('search reducer:', action.searchedEmail)
       return state
     case 'SEARCH_USERS_ERROR':
       return state
