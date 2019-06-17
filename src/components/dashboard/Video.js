@@ -31,6 +31,9 @@ export default class Video extends Component {
       tempSocket.on("message", (messageData) => {
         alert(messageData);
       });
+      tempSocket.on("online-users", (userArray) => {
+        console.log(userArray);
+      });
       tempSocket.on("calling", (callingUser, callingSocket) => {
         if (window.confirm(`Would you like to accept a call from ${callingUser}?`)) {
           console.log("Accepting call");
@@ -41,7 +44,7 @@ export default class Video extends Component {
           this.state.mySocket.emit("reject-call", this.state.myName, callingSocket);
           // TODO Destroy recorder!
         }
-      })
+      });
       
       tempSocket.on("rtc-offer", (callingUser, callingSocket, offerData) => {
         console.log("receiving offer", offerData);
@@ -72,6 +75,7 @@ export default class Video extends Component {
     console.log("Initialized client-side socket: ", this.state.mySocket);
     // talk to socket server to say "I'm online"
     this.state.mySocket.emit("initialize", this.state.myName);
+    // ADD PEER CONNECTION INITIALIZATION HERE?
   }
 
   startCall = async () => {
@@ -83,7 +87,7 @@ export default class Video extends Component {
         receiverName
       });
       
-      await this.createPeerConnection();
+      this.createPeerConnection();
       console.log("Created caller's connection", this.state.myPeerConnection);
       
       await this.setUpOpusRecorder();
@@ -94,7 +98,7 @@ export default class Video extends Component {
       };
       navigator.mediaDevices.getUserMedia(mediaConstraints)
         .then((localStream) => {
-          document.getElementById("local_video").srcObject = localStream;
+          //document.getElementById("local_video").srcObject = localStream;
           localStream.getTracks().forEach(track => this.state.myPeerConnection.addTrack(track, localStream));
           this.state.mediaRecorder.start(localStream);
           // this.setState({
@@ -243,7 +247,7 @@ export default class Video extends Component {
     console.log("Shutting down call.")
     if (this.state.mediaRecorder) {
       this.state.mediaRecorder.stop();
-      setTimeout(() => {this.state.mySocket.emit("end-recording");}, 3000);
+      setTimeout(() => {this.state.mySocket.emit("end-recording");}, 2000);
     }
     this.resetMyPeerConnection();
     this.setState({
@@ -344,11 +348,13 @@ export default class Video extends Component {
   
   // For stand-alone recording tests. LEFT FOR REFERENCE ONLY
   stopRecording = () => {
-    this.state.mediaRecorder.stop();
-    setTimeout(() => {
-      console.log("asking server to translate");
-      this.state.mySocket.emit("end-recording-only");
-    }, 2000);
+    this.state.mySocket.emit("get-online-users");
+    // TEMPORARILY COMMENTED OUT FOR OTHER TESTING
+    // this.state.mediaRecorder.stop();
+    // setTimeout(() => {
+    //   console.log("asking server to translate");
+    //   this.state.mySocket.emit("end-recording-only");
+    // }, 2000);
   }
 
   // ----------------------- LEFT FOR REFERENCE ONLY ------------------------
