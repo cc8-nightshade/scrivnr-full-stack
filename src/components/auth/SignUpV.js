@@ -21,8 +21,10 @@ class SignUpV extends Component {
 
   render() {
     return (
-      <div id="modal-signup" className="modal">
+      <div id="modal-signup" className="container">
+        {/* className="modal" */}
         <div className="modal-content">
+        {/* className="modal-content" */}
           <h4>Sign up</h4><br/>
           <form onSubmit={this.handleSubmit} id="signup-form">
             <div className="input-field">

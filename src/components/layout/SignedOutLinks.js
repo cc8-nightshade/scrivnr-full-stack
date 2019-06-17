@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
 const SignedOutLinks = () => {
   return (
@@ -7,9 +7,11 @@ const SignedOutLinks = () => {
     <div>
       
         <div className="">
-          <a href="#" data-target="mobile-demo" className="sidenav-trigger"><i className="material-icons">menu</i></a>
+          <a href="/#" data-target="mobile-demo" className="sidenav-trigger"><i className="material-icons">menu</i></a>
           <ul className="right hide-on-med-and-down">
-            <li><NavLink to='/about'>About</NavLink></li>
+
+            <li><NavLink to='/contacts'>Contacts</NavLink></li>
+
             <li><NavLink to='/signup'>Sign Up</NavLink></li>
             <li><NavLink to='/signin'>Sign In</NavLink></li>
           </ul>
@@ -17,7 +19,6 @@ const SignedOutLinks = () => {
       
 
       <ul className="sidenav" id="mobile-demo">
-        <li><NavLink to='/about'>About</NavLink></li>
         <li><NavLink to='/signup'>Sign Up</NavLink></li>
         <li><NavLink to='/signin'>Sign In</NavLink></li>
       </ul>

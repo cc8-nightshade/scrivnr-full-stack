@@ -6,7 +6,9 @@ import ContactList from "./components/contacts/ContactList";
 import Video from "./components/dashboard/Video";
 import SignIn from "./components/auth/SignIn";
 import SignUp from "./components/auth/SignUp";
-import Transcripts from "./components/dashboard/Transcripts";
+import SignUpV from "./components/auth/SignUpV"
+import SearchUsers from "./components/contacts/SearchUsers"
+
 import "./App.css";
 
 class App extends Component {
@@ -18,10 +20,12 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={Video} />
             <Route path="/about" component={Dashboard} />
-            <Route path="/transcripts" component={Transcripts} />
             <Route path="/contacts" component={ContactList} />
             <Route path="/signin" component={SignIn} />
             <Route path="/signup" component={SignUp} />
+            <Route path="/signupv" component={SignUpV} />
+            <Route path="/search" component={SearchUsers} />
+
           </Switch>
         </div>
       </BrowserRouter>
