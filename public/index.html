@@ -49,25 +49,15 @@
 <!-- TODO: Add SDKs for Firebase products that you want to use
   https://firebase.google.com/docs/web/setup#config-web-app -->
   
-  <script>
-    // document.addEventListener('DOMContentLoaded', function() {
-    //   var elems = document.querySelectorAll('.sidenav');
-    //   var instances = M.Sidenav.init(elems, options);
-    // });
-
-      require('dotenv').config()
-      // Your web app's Firebase configuration
-      var firebaseConfig = {
-        apiKey: process.env.FIREBASE_API,
-        authDomain: "scrivnr-8564b.firebaseapp.com",
-        databaseURL: "https://scrivnr-8564b.firebaseio.com",
-        projectId: "scrivnr-8564b",
-        storageBucket: "scrivnr-8564b.appspot.com",
-        messagingSenderId: "965017963607",
-        appId: "1:965017963607:web:f4a5340fb6997601"
-      };
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
+    <script>
+   
+      document.addEventListener('DOMContentLoaded', () => {
+        const modals = document.querySelectorAll('.modal')
+        M.Modal.init(modals)
+        
+        const items = document.querySelectorAll('.collapsible')
+        M.Collapsible.init(items)
+      })
     </script>
   </body>
 </html>

@@ -1,28 +1,24 @@
 const intitialState = {
-  contacts: [
-    { id: 1,
-      firstName: 'Min',
-      lastName: 'Kim'
-    },
-    { id: 2,
-      firstName: 'Ian',
-      lastName: 'Cameron'
-    },
-    { id: 3,
-      firstName: 'Konst',
-      lastName: 'Varg'
-    },
-  ]
+  contactArray: '',
+  filteredArray:[{uid:2}]
 }
 
 
 const contactsReducer = (state = intitialState, action) => {
   switch(action.type){
-    case 'CREATE_CONTACT':
-      console.log('yolo', action.contact)
+    case 'ADD_CONTACT':
+      console.log('add contact reducer called ')
+      return state
+    case 'DELETE_CONTACT':
+      console.log('delete called', action.filteredArray)
+      state.filteredArray = action.filteredArray
+      return state
+    case 'GET_CONTACTS':
+      state.contactArray = action.contactArray
+      return state
+    default:
       return state
   }
-  return state
 }
 
 export default contactsReducer
