@@ -6,9 +6,12 @@
 .pnp.js
 
 server/ssl/*
+#gcp
+server/gcpSetup.js
 .env
 
 .DS_Store
+.gitignore
 
 # testing
 /coverage
@@ -22,6 +25,9 @@ server/ssl/*
 .env.development.local
 .env.test.local
 .env.production.local
+transcriptions
+
+
 
 npm-debug.log*
 yarn-debug.log*

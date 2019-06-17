@@ -1,10 +1,11 @@
 import React from 'react';
 
 const Contact = ({contactInfo}) => {
+  // console.log('contact:' ,contactInfo)
   return(
     <div className="contact">
       <div className="card ">
-        <p>{contactInfo.id}</p>
+        {/* <p>{contactInfo.id}</p> */}
         <h5>{contactInfo.firstName} {contactInfo.lastName}</h5>
       </div>
     </div>

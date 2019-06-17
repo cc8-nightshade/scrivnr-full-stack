@@ -1,41 +1,35 @@
-import React, {Component} from 'react'
+import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { signOut } from '../../store/actions/authActions'
 
+const SignedInLinks = (props) => {
+  return (
+    <div>
+      <ul className="right">
+        <li>{props.profile.firstName}</li>
+        <li><NavLink to='/transcripts'>Transcripts</NavLink></li>
+        <li><NavLink to='/search'>Search for People</NavLink></li>
+        <li><NavLink to='/contacts'>Contacts</NavLink></li>
+        <li><p onClick={props.signOut}>Log Out</p></li>
+        {/* <li><NavLink to='/account' className="btn btn-floating pink lighten-1">IC</NavLink></li> */}
+      </ul>
+    </div>
+  )
+}
 
-class  SignedInLinks extends Component {
-
-  componentDidMount(){
-   
-  };
-  
-
-  render (){
-    return (
-      <div>
-        <nav>
-          <a href="#" data-target="mobile-demo" className="sidenav-trigger"><i className="material-icons">menu</i></a>
-          <ul className="right hide-on-med-and-down">
-            <li><NavLink to='/contacts'>Contacts</NavLink></li>
-            <li><NavLink to='/transcripts'>Transcripts</NavLink></li>
-            <li><NavLink to='/logout'>Log Out</NavLink></li>
-            <li><NavLink to='/' className='btn btn-floating pink lighten-1'>IC</NavLink></li>
-          </ul>
-
-        </nav>
-        
-  
-        <ul className="sidenav" id="mobile-demo">
-          <li><NavLink to='/contacts'>Contacts</NavLink></li>
-          <li><NavLink to='/transcripts'>Transcripts</NavLink></li>
-          <li><NavLink to='/logout'>Log Out</NavLink></li>
-          <li><NavLink to='/' className='btn btn-floating pink lighten-1'>IC</NavLink></li>
-        </ul>
-      </div>
-      
-    )
-
-
+const mapDispatchToProps = (dispatch) => {
+  return {
+    signOut: () => dispatch(signOut())
   }
 }
 
-export default SignedInLinks
+export default connect(null, mapDispatchToProps)(SignedInLinks)
+
+// const mapDispatchToProps = dispatch => {
+//   return{
+//     signOut: () => dispatch(signOut)
+//   }
+// }
+
+// export default connect(null, mapDispatchToProps)(SignedInLinks)
