@@ -26,7 +26,6 @@ class ContactList extends Component {
     this.state = {
       showCreateForm: false,
       yolo: true,
-      myName: '',
       mySocket: undefined,
       myPeerConnection: undefined,
       mediaRecorder: undefined,
@@ -59,12 +58,27 @@ class ContactList extends Component {
   sendUserInfoToServer = async () => {
 
      // Initialize Socket
-    const tempSocket = io.connect("http://localhost:9000");
+    const tempSocket = io.connect();
     // Initialize Socket Details
     {
       tempSocket.on("message", (messageData) => {
         alert(messageData);
       });
+      tempSocket.on("online-users", (userArray) => {
+        console.log(userArray);
+      });
+      tempSocket.on("calling", (callingUser, callingSocket) => {
+        if (window.confirm(`Would you like to accept a call from ${callingUser}?`)) {
+          console.log("Accepting call");
+          this.state.mySocket.emit("accept-call", callingUser, callingSocket);
+        }
+        else { // If the user rejects call
+          console.log("Rejecting call");
+          this.state.mySocket.emit("reject-call", this.props.auth.email, callingSocket);
+          // TODO Destroy recorder!
+        }
+      });
+      
       tempSocket.on("rtc-offer", (callingUser, callingSocket, offerData) => {
         console.log("receiving offer", offerData);
         if (this.state.myPeerConnection === undefined) {
@@ -95,7 +109,7 @@ class ContactList extends Component {
     // talk to socket server to say "I'm online"
     // this is where get from redux
 
-    this.state.mySocket.emit("initialize", this.props.email);
+    this.state.mySocket.emit("initialize", this.props.auth.email);
     // this.state.mySocket.emit("initialize", this.state.myName);
     this.state.mySocket.on("online-users", (onlineUsers) => {
       this.props.getOnlineUsers(onlineUsers)
@@ -161,7 +175,7 @@ class ContactList extends Component {
         });
       this.state.mySocket.emit(
         "rtc-offer", 
-        this.state.myName,
+        this.props.auth.email,
         this.state.receiverName,
         {
           sdp: this.state.myPeerConnection.localDescription
@@ -206,7 +220,7 @@ class ContactList extends Component {
       );
     } 
     else { // If the user rejects call
-      this.state.mySocket.emit("reject-call", this.state.myName, callerSocket);
+      this.state.mySocket.emit("reject-call", this.props.auth.email, callerSocket);
       this.resetMyPeerConnection();
       // TODO Destroy recorder!
     }
@@ -331,7 +345,6 @@ class ContactList extends Component {
       // form = <CreateContact />;
     }
     const { auth, contacts, onlineNow } = this.props;
-    console.log('Hello from contacts list', auth.email)
     if (!auth.uid) {
       return <Redirect to="/signin" />;
     }
@@ -386,6 +399,27 @@ class ContactList extends Component {
           Add new contact
         </button>
         {form} */}
+        <div className=" ">
+        {/* <div onClick={this.initialConnect}>Click me to connect to socket.io</div> */}
+          <div className="camera-box">
+            <video id="received_video" autoPlay></video>
+            <video id="local_video" autoPlay muted></video>
+          </div>
+          
+        </div>
+        <div className="">
+          <button onClick={this.startCall} className="">Start Chat</button>
+          {/* <button onClick={this.acceptCall} className="waves-effect waves-light btn-large">Accept Call</button> */}
+          <button id="hangup-button" className="" onClick={this.hangUpCall}>
+            Hang Up
+          </button>
+          <button id="record" onClick={this.startRecording}>
+            record
+          </button>
+          <button id="stop-recording" onClick={this.stopRecording}>
+            Stop
+          </button>
+        </div>
       </div>
     );
   }

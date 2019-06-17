@@ -15,7 +15,7 @@ export default class Video extends Component {
   }
 
   componentDidMount(){
-    this.initialConnect();
+    //this.initialConnect();
   }
 
   initialConnect = async () => {

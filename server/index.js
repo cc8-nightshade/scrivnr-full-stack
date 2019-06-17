@@ -21,23 +21,23 @@ app.use("/audio", express.static('audio'));
 
 
 // HTTP VERSION
-console.log("Starting server...");
-const server = app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}!`);
-});
-let io = socket(server);
+// console.log("Starting server...");
+// const server = app.listen(PORT, () => {
+//   console.log(`App listening on port ${PORT}!`);
+// });
+// let io = socket(server);
 // END HTTP VERSION
 
 // HTTPS version
-// let https = require('https');
-// const privateKey = fs.readFileSync('./server/ssl/server.key');
-// const certificate = fs.readFileSync('./server/ssl/server.cert');
-// const credentials = {key: privateKey, cert: certificate};
-// let httpsServer = https.createServer(credentials, app);
-// httpsServer.listen(PORT);
-// console.log(`httpsServer listening on port ${PORT}!`);
-// let io = socket(httpsServer);
-// console.log(`Attached socket to httpsServer!`);
+let https = require('https');
+const privateKey = fs.readFileSync('./server/ssl/server.key');
+const certificate = fs.readFileSync('./server/ssl/server.cert');
+const credentials = {key: privateKey, cert: certificate};
+let httpsServer = https.createServer(credentials, app);
+httpsServer.listen(PORT);
+console.log(`httpsServer listening on port ${PORT}!`);
+let io = socket(httpsServer);
+console.log(`Attached socket to httpsServer!`);
 // END HTTPS CODE
 
 const {
@@ -101,7 +101,7 @@ io.on("connection", (socket) => {
         offer,
         candidates: []
       };
-      console.log(`Stored call from ${callingUser} to ${receivingUser}`);
+      console.log(`Stored call from ${callingUser} to ${receivingUser} (${receivingSocket})`);
       io.to(receivingSocket).emit("calling", callingUser, socket.id);
     } else {
       io.to(socket.id).emit("reject-call", receivingUser);
