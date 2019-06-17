@@ -242,14 +242,14 @@ class ContactList extends Component {
       this.state.mySocket.emit("rtc-answer", callerSocket, {
         sdp: this.state.myPeerConnection.localDescription
       });
-    } else {
-      // If the user rejects call
-      this.state.mySocket.emit(
-        "reject-call",
-        this.props.auth.email,
-        callerSocket
-      );
-
+    // } else {
+    //   // If the user rejects call
+    //   this.state.mySocket.emit(
+    //     "reject-call",
+    //     this.props.auth.email,
+    //     callerSocket
+    //   );
+    
       // Confirmation logic moved elsewhere
     // } 
     // else { // If the user rejects call
