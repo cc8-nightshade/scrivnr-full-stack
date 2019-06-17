@@ -2,10 +2,13 @@ const shortid = require("shortid");
 const speech = require("@google-cloud/speech");
 const { firebase } = require("./firebase");
 const db = firebase.firestore();
+const moment = require("moment");
 
-const initializeConversationData = (caller, receiver) => {
-  let id = shortid.generate();
+const initializeConversationData = (initiateTime, caller, receiver) => {
   let startDateTime = new Date();
+  // Calculate time to pick up to tenth of a second for later processing
+  const timeToPickUp = (Math.round((startDateTime - initiateTime) / 100) / 10) - 1;
+  let id = moment(startDateTime).format("YYYYMMDDHHMM") + shortid.generate();
   return {
     newID: id,
     newConversation: {
@@ -13,26 +16,29 @@ const initializeConversationData = (caller, receiver) => {
       caller,
       receiver,
       speech: [],
-      startDateTime
+      startDateTime,
+      timeToPickUp
     }
   };
 };
 
-const extractConversationData = (speaker, googleArray) => {
+const extractConversationData = (speaker, recordStartTime, googleArray) => {
   let speechArray = [];
   let results = googleArray[0].results;
   if (results === undefined) {
     return [{
       speaker,
       text: "Did not speak/not intelligible",
-      time: 0
+      time: 0,
+      bookmark: false,
+      questionable: true
     }];
   } 
   for (let result of results) {
     // get text
     let text = result.alternatives[0].transcript;
     // Get and Procees time
-    let time = 0;
+    let time = 0 - recordStartTime;
     let timeObject = result.alternatives[0].words[0].startTime;
     if (timeObject.seconds !== undefined) {
       time += parseInt(timeObject.seconds);
@@ -43,14 +49,16 @@ const extractConversationData = (speaker, googleArray) => {
     // Checking questionable result
     let questionable = result.alternatives[0].confidence < 0.9 ? true : false;
 
-    // Pushing element
-    speechArray.push({
-      speaker,
-      text,
-      time,
-      bookmark: false,
-      questionable
-    });
+    if (time > 0) {
+      // Pushing element
+      speechArray.push({
+        speaker,
+        text,
+        time,
+        bookmark: false,
+        questionable
+      });
+    }
   }
   return speechArray;
 };
