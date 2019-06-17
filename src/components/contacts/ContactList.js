@@ -403,8 +403,10 @@ class ContactList extends Component {
     // console.log(firebase.setListener('users'))
     return (
       <div className="contact-video wrapper container">
+      
         {/* CONTACTS START */}
         <div className="contact-list container">
+          <h6 className="user-header">Logged in as: {this.props.profile.firstName}</h6>
           <div className="search-users">
             <SearchUsers />
           </div>
@@ -422,12 +424,12 @@ class ContactList extends Component {
                     // if you click the name then it will connect with that user by email
                     return (
                       <li key={index} className="collection-item">
-                        {contact.firstName} {contact.lastName}: {contact.email}
+                        {contact.firstName} {contact.lastName}
                         <i
                           className="secondary-content material-icons"
                           onClick={() => this.startCall(contact.email)}
                         >
-                          send
+                          call
                         </i>
                         <i
                           className="secondary-content material-icons"
@@ -454,7 +456,10 @@ class ContactList extends Component {
                   if (!onlineNow.includes(contact.email)) {
                     return (
                       <li key={index} className="collection-item">
-                        {contact.firstName} {contact.lastName}: {contact.email}
+                        {contact.firstName} {contact.lastName}
+                        <i className="secondary-content material-icons">
+                          not_interested
+                        </i>
                         <i
                           className="secondary-content material-icons"
                           onClick={() => {
@@ -475,30 +480,30 @@ class ContactList extends Component {
 
         {/* CONTACTS ENDS */}
         {/* <p>{contacts.uid}</p> */}
-          <div className=" ">
+          <div className="container video-hangup-wrapper ">
             {/* <div onClick={this.initialConnect}>Click me to connect to socket.io</div> */}
             <div className="camera-box">
               <video id="received_video" autoPlay />
               <video id="local_video" autoPlay muted />
             </div>
+            <div className="">
+              {/* <button onClick={() => this.startCall()} className="">
+                Start Chat
+              </button> */}
+              {/* <button onClick={this.acceptCall} className="waves-effect waves-light btn-large">Accept Call</button> */}
+              <button id="hangup-button" className="btn hangup" onClick={this.hangUpCall}>
+                Hang Up
+              </button>
+              {/* <button id="record" onClick={this.startRecording}>
+                record
+              </button>
+              <button id="stop-recording" onClick={this.stopRecording}>
+                Stop
+              </button> */}
+            </div>
           </div>
         
 
-          <div className="">
-            <button onClick={() => this.startCall()} className="">
-              Start Chat
-            </button>
-            {/* <button onClick={this.acceptCall} className="waves-effect waves-light btn-large">Accept Call</button> */}
-            <button id="hangup-button" className="" onClick={this.hangUpCall}>
-              Hang Up
-            </button>
-            <button id="record" onClick={this.startRecording}>
-              record
-            </button>
-            <button id="stop-recording" onClick={this.stopRecording}>
-              Stop
-            </button>
-          </div>
         {/* {users &&
           users.map((contact, index) => {
             return <Contact contactInfo={contact} key={index} />;
@@ -518,7 +523,9 @@ const mapStateToProps = state => {
     currentUserInfo: state.users.userInfo,
     contacts: state.contacts.contactArray,
     onlineNow: state.users.onlineUsers,
-    auth: state.firebase.auth
+    auth: state.firebase.auth,
+    profile: state.firebase.profile
+
   };
 };
 
@@ -529,7 +536,7 @@ const mapDispatchToProps = dispatch => {
     getUsers: () => dispatch(getUsers()),
     getOnlineUsers: onlineUsers => dispatch(getOnlineUsers(onlineUsers)),
     deleteContact: (searchedEmail, currentUserUid) =>
-      dispatch(deleteContact(searchedEmail, currentUserUid))
+    dispatch(deleteContact(searchedEmail, currentUserUid))
   };
 };
 

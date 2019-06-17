@@ -6,7 +6,7 @@ const SignedOutLinks = () => {
   
     <div>
       
-        <div className="">
+        {/* <div className="">
           <a href="/#" data-target="mobile-demo" className="sidenav-trigger"><i className="material-icons">menu</i></a>
           <ul className="right hide-on-med-and-down">
 
@@ -15,10 +15,10 @@ const SignedOutLinks = () => {
             <li><NavLink to='/signup'>Sign Up</NavLink></li>
             <li><NavLink to='/signin'>Sign In</NavLink></li>
           </ul>
-        </div>
+        </div> */}
       
 
-      <ul className="sidenav" id="mobile-demo">
+      <ul className="right" id="">
         <li><NavLink to='/signup'>Sign Up</NavLink></li>
         <li><NavLink to='/signin'>Sign In</NavLink></li>
       </ul>
