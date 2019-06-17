@@ -270,8 +270,9 @@ class ContactList extends Component {
   endCall = () => {
     console.log("Shutting down call.")
     if (this.state.mediaRecorder) {
+      console.log("Going to send message to server");
       this.state.mediaRecorder.stop();
-      setTimeout(() => {this.state.mySocket.emit("end-record");}, 3000);
+      setTimeout(() => {this.state.mySocket.emit("end-recording");}, 3000);
     }
     this.resetMyPeerConnection();
     this.setState({
