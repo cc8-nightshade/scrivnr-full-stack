@@ -23,6 +23,11 @@ const usersReducer = (state = intitialState, action) => {
       return state
     case 'SEARCH_USERS_ERROR':
       return state
+    case 'ONLINE_USERS':
+      state.onlineUsers = action.onlineUsers
+      return state
+    case 'SEARCH_USERS_ERROR':
+      return state
     default:
       return state
   }
