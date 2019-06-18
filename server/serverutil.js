@@ -134,10 +134,21 @@ const addDialogue = data => {
     });
 };
 
+const createOnlineUserList = (me, connectedUsers) => {
+  let userArray = [];
+  for (let userSocket in connectedUsers) {
+    // if (userSocket !== me) {
+      userArray.push(connectedUsers[userSocket]['userName']);
+    // }
+  }
+  return userArray;
+}
+
 module.exports = {
   initializeConversationData,
   extractConversationData,
   addSpeech,
   getTranscription,
-  addDialogue
+  addDialogue,
+  createOnlineUserList
 };
