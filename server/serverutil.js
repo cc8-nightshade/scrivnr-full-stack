@@ -12,7 +12,7 @@ const initializeConversationData = (initiateTime, caller, receiver) => {
   console.log(startDateTime);
   // Calculate time to pick up to tenth of a second for later processing
   const timeToPickUp =
-    Math.round((startDateTime - initiateTime) / 100) / 10 - 1;
+    Math.round((startDateTime - initiateTime) / 100) / 10;
   let id = moment(startDateTime).format("YYYYMMDDHHMM") + shortid.generate();
   return {
     newID: id,
@@ -22,7 +22,8 @@ const initializeConversationData = (initiateTime, caller, receiver) => {
       receiver,
       speech: [],
       startDateTime,
-      timeToPickUp
+      timeToPickUp,
+      bookmarks: []
     }
   };
 };
@@ -70,18 +71,27 @@ const extractConversationData = (speaker, recordStartTime, googleArray) => {
   return speechArray;
 };
 
-const addSpeech = (conversation, newSpeechArray) => {
-  let pleaseSort = false;
-  if (conversation.speech.length > 0) {
-    pleaseSort = true;
-  }
+const addSpeech = (userName, conversation, newSpeechArray, bookmarks) => {
+  // let pleaseSort = false;
+  // if (conversation.speech.length > 0) {
+  //   pleaseSort = true;
+  // }
   conversation.speech = conversation.speech.concat(newSpeechArray);
-  if (pleaseSort) {
-    // console.log("needs sorting");
-    conversation.speech.sort((a, b) => {
-      return a.time <= b.time ? -1 : 1;
-    });
+  for (let bookmark of bookmarks) {
+    conversation.speech.push({
+      speaker: userName,
+      text: "",
+      time: bookmark,
+      bookmark: true,
+      questionable: false
+    })
   }
+  // if (pleaseSort) {
+  //   // console.log("needs sorting");
+  //   conversation.speech.sort((a, b) => {
+  //     return a.time <= b.time ? -1 : 1;
+  //   });
+  // }
 };
 
 const getTranscription = async (audioBytes, socketID) => {

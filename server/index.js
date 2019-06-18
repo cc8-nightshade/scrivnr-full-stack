@@ -52,6 +52,7 @@ let connectedUsers = {};
 let bufferData = {};
 let conversations = {};
 let offers = {};
+let bookmarks = {};
 
 io.on("connection", (socket) => {
   socket.on("disconnect", () => {
@@ -85,6 +86,7 @@ io.on("connection", (socket) => {
     io.to(socket.id).emit("online-users", userArray);
   });
   socket.on("rtc-offer", (callingUser, receivingUser, offer) => {
+    
     console.log(`Received offer from ${callingUser} >>> ${receivingUser}`);
     // find receiving user's socket
     let receivingSocket = '';
@@ -103,20 +105,14 @@ io.on("connection", (socket) => {
       };
       console.log(`Stored call from ${callingUser} to ${receivingUser} (${receivingSocket})`);
       io.to(receivingSocket).emit("calling", callingUser, socket.id);
-    } else {
+    } else { // REJECT IF CAN'T FIND USER/SOCKET
       io.to(socket.id).emit("reject-call", receivingUser);
     }
-    // OLD METHOD OF IMMEDIATE FORWARDING
-    // // If user found in list, forward request
-    // if (receivingSocket !== '' && io.sockets.connected[receivingSocket] !== undefined) {
-    //   io.to(receivingSocket).emit("rtc-offer", callingUser, socket.id, offer);
-    //   // connectedUsers[socket.id]["partnerSocket"] = receivingSocket;
-    // } else {
-    //   io.to(socket.id).emit("reject-call", receivingUser);
-    // }
   });
+
   socket.on("accept-call", (callingUser, callingSocket) => {
     console.log(`call from ${callingUser} accepted by ${socket.id}`);
+    let receiverStartTime = new Date();
     // send offer to accepting user
     io.to(socket.id).emit(
       "rtc-offer", 
@@ -125,19 +121,33 @@ io.on("connection", (socket) => {
       offers[callingSocket]['offer']
     );
     // sending candidates saved up on the server
-    // setTimeout(() => {
-      if (offers[callingSocket]['candidates'].length > 0) {
-        for (let candidate of offers[callingSocket]['candidates']) {
-          io.to(socket.id).emit("new-ice-candidate", candidate);
-        }
+    if (offers[callingSocket]['candidates'].length > 0) {
+      for (let candidate of offers[callingSocket]['candidates']) {
+        io.to(socket.id).emit("new-ice-candidate", candidate);
       }
-    // }, 200);
+    }
+
+    // Initialize bookmarks object: caller
+    bookmarks[callingSocket] = {
+      startTime: offers[callingSocket]['initiateTime'],
+      bookmarks: []
+    };
+    // Initialize bookmarks object: receiver
+    bookmarks[socket.id] = {
+      startTime: receiverStartTime,
+      bookmarks: []
+    };
+
     // create new Conversation Object
     const {newID, newConversation} = 
-    initializeConversationData(
-      offers[callingSocket]['initiateTime'],
+      initializeConversationData(
+        offers[callingSocket]['initiateTime'],
+        connectedUsers[callingSocket]['userName'], 
       connectedUsers[callingSocket]['userName'], 
-      connectedUsers[socket.id]['userName']
+        connectedUsers[callingSocket]['userName'], 
+      connectedUsers[callingSocket]['userName'], 
+        connectedUsers[callingSocket]['userName'], 
+        connectedUsers[socket.id]['userName']
       );
       
       conversations[newID] = newConversation;
@@ -163,8 +173,6 @@ io.on("connection", (socket) => {
   socket.on("rtc-answer", (callerSocket, answer) => {
     console.log(`transmitting answer from ${socket.id} to ${callerSocket}`);
     io.to(callerSocket).emit("rtc-answer", answer);
-
-
   });
 
   socket.on("new-ice-candidate", (candidate) => {
@@ -180,9 +188,15 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("bookmark", (userName) => {
+    let bookmarkDateTime = new Date();
+    let bookmarkTime = Math.round((bookmarkDateTime - bookmarks[socket.id]['startTime']) / 100) / 10;
+    bookmarks[socket.id]['bookmarks'].push(bookmarkTime);
+    console.log(`Bookmark -- User (${socket.id}) Time (${bookmarkTime})`);
+  });
+
   socket.on("hang-up", () => {
     console.log("Following connection is hanging up", socket.id);
-    
     let targetSocket = connectedUsers[socket.id]["partnerSocket"];
     io.to(targetSocket).emit("hang-up");
   });
@@ -224,12 +238,14 @@ io.on("connection", (socket) => {
       }
 
       addSpeech(
+        connectedUsers[socket.id]['userName'],
         currentConversation, 
         extractConversationData(
           connectedUsers[socket.id]['userName'], 
           recordStartTime,
           googleResult
-        )
+        ),
+        bookmarks[socket.id]['bookmarks']
       );
 
       if (lastUser) {
@@ -242,6 +258,7 @@ io.on("connection", (socket) => {
       }
       // Clear data from the server, reset the users' conversation data
       delete bufferData[socket.id];
+      delete bookmarks[socket.id];
       connectedUsers[socket.id]['conversationID'] = null;
       connectedUsers[socket.id]['partnerSocket'] = null; 
       console.log(`deleted user ${socket.id} from recording data, leaving ${Object.keys(bufferData)}`);
