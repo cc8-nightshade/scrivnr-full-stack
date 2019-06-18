@@ -53,7 +53,7 @@ class TranscriptList extends Component {
               <ul>
                 {transcript.speech &&
                   transcript.speech.map((item, index) => {
-                    if (item.bookmark && transcript.caller === item.speaker) {
+                    if (item.bookmark && this.props.auth.email === item.speaker) {
                       return (
                         <li
                           key={index}
@@ -63,7 +63,7 @@ class TranscriptList extends Component {
                           <span className="bookmark">Bookmark</span>
                         </li>
                       );
-                    } else if (item.bookmark && transcript.caller !== item.speaker){}
+                    } else if (item.bookmark && this.props.auth.email !== item.speaker){}
                     else {
                       const time = new Date(transcript.startDate.toDate());
                       time.setSeconds(time.getSeconds() + item.time);
