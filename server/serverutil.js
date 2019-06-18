@@ -12,7 +12,7 @@ const initializeConversationData = (initiateTime, caller, receiver) => {
   console.log(startDateTime);
   // Calculate time to pick up to tenth of a second for later processing
   const timeToPickUp =
-    Math.round((startDateTime - initiateTime) / 100) / 10 - 1;
+    Math.round((startDateTime - initiateTime) / 100) / 10;
   let id = moment(startDateTime).format("YYYYMMDDHHMM") + shortid.generate();
   return {
     newID: id,
@@ -22,7 +22,8 @@ const initializeConversationData = (initiateTime, caller, receiver) => {
       receiver,
       speech: [],
       startDateTime,
-      timeToPickUp
+      timeToPickUp,
+      bookmarks: []
     }
   };
 };
@@ -70,12 +71,21 @@ const extractConversationData = (speaker, recordStartTime, googleArray) => {
   return speechArray;
 };
 
-const addSpeech = (conversation, newSpeechArray) => {
-  let pleaseSort = false;
-  if (conversation.speech.length > 0) {
-    pleaseSort = true;
-  }
+const addSpeech = (userName, conversation, newSpeechArray, bookmarks) => {
+  let timeShift = userName === conversation.caller ? conversation.timeToPickUp : 0;
+  const pleaseSort = (conversation.speech.length > 0) ? true : false;
+  
   conversation.speech = conversation.speech.concat(newSpeechArray);
+  
+  for (let bookmark of bookmarks) {
+    conversation.speech.push({
+      speaker: userName,
+      text: "",
+      time: bookmark - timeShift,
+      bookmark: true,
+      questionable: false
+    })
+  }
   if (pleaseSort) {
     // console.log("needs sorting");
     conversation.speech.sort((a, b) => {
@@ -124,10 +134,21 @@ const addDialogue = data => {
     });
 };
 
+const createOnlineUserList = (me, connectedUsers) => {
+  let userArray = [];
+  for (let userSocket in connectedUsers) {
+    // if (userSocket !== me) {
+      userArray.push(connectedUsers[userSocket]['userName']);
+    // }
+  }
+  return userArray;
+}
+
 module.exports = {
   initializeConversationData,
   extractConversationData,
   addSpeech,
   getTranscription,
-  addDialogue
+  addDialogue,
+  createOnlineUserList
 };
