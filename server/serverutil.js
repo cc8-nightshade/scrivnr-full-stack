@@ -72,26 +72,26 @@ const extractConversationData = (speaker, recordStartTime, googleArray) => {
 };
 
 const addSpeech = (userName, conversation, newSpeechArray, bookmarks) => {
-  // let pleaseSort = false;
-  // if (conversation.speech.length > 0) {
-  //   pleaseSort = true;
-  // }
+  let timeShift = userName === conversation.caller ? conversation.timeToPickUp : 0;
+  const pleaseSort = (conversation.speech.length > 0) ? true : false;
+  
   conversation.speech = conversation.speech.concat(newSpeechArray);
+  
   for (let bookmark of bookmarks) {
     conversation.speech.push({
       speaker: userName,
       text: "",
-      time: bookmark,
+      time: bookmark - timeShift,
       bookmark: true,
       questionable: false
     })
   }
-  // if (pleaseSort) {
-  //   // console.log("needs sorting");
-  //   conversation.speech.sort((a, b) => {
-  //     return a.time <= b.time ? -1 : 1;
-  //   });
-  // }
+  if (pleaseSort) {
+    // console.log("needs sorting");
+    conversation.speech.sort((a, b) => {
+      return a.time <= b.time ? -1 : 1;
+    });
+  }
 };
 
 const getTranscription = async (audioBytes, socketID) => {
