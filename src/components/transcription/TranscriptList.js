@@ -42,7 +42,8 @@ class TranscriptList extends Component {
                       this.selectItem(index);
                     }}
                   >
-                    {moment(item.startDate.toDate()).format("YYYY/MM/DD HH:mm")}
+                    {moment(item.startDate.toDate()).format("YYYY/MM/DD HH:mm")} <br />
+                    {this.props.auth.email === item.caller ? item.receiver : item.caller}
                   </li>
                 ))}
             </ul>
