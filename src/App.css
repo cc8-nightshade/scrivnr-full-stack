@@ -17,6 +17,11 @@
   
 }
 
+i {
+  cursor:pointer;
+
+}
+
 .user-header {
   margin-top: -20px;
   margin-bottom: 20px;
@@ -49,6 +54,14 @@
 
 #hangup-button {
   display: inline-block;
+}
+
+button {
+  cursor:pointer;
+}
+
+.button {
+  cursor:pointer;
 }
 
 video {
@@ -158,6 +171,12 @@ height: 480px; */
     width: 50%;
     height: 20px;
   } */
+  button {
+    cursor:pointer;
+  }
+  .buttons {
+    cursor:pointer;
+  }
 
 }
 

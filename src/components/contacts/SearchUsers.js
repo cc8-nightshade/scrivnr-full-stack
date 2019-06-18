@@ -37,9 +37,9 @@ export class SearchUsers extends Component {
             <label htmlFor='number'>Search by Email</label>
             <input type="text" id="searchedEmail" onChange={this.handleChange}/>
           </div>
-          <div className="input-field">
-            <button type="submit" className="btn">Search</button>
-          </div>
+          {/* <div className="input-field"> */}
+            <button type="submit" className="btn buttons">Search</button>
+          {/* </div> */}
         </form>
         { searchedEmail &&
           <ul className="collection">

@@ -18,6 +18,7 @@ class SignUp extends Component {
   handleSubmit = (event) => {
     event.preventDefault()
     this.props.signUp(this.state)
+    return <Redirect to='/contacts'></Redirect>
   }
 
   render() {

@@ -61,6 +61,7 @@ class SignIn extends Component {
   handleSubmit = (event) => {
     event.preventDefault()
     this.props.signIn(this.state)
+    return <Redirect to='/contacts'></Redirect>
   
   }
 

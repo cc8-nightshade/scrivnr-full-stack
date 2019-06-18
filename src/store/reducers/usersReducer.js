@@ -2,7 +2,7 @@ const intitialState = {
   users: '',
   userInfo: '',
   searchedEmail: null,
-  onlineUsers: ["bob@bob.com", "ian@ian.com", "mollky@mol.com", "unjae@kim.com", "tombonaventure@hotmail.com", "min@min.com"]
+  onlineNow: []
 }
 
 
@@ -24,7 +24,7 @@ const usersReducer = (state = intitialState, action) => {
     case 'SEARCH_USERS_ERROR':
       return state
     case 'ONLINE_USERS':
-      state.onlineUsers = action.onlineUsers
+      state.onlineNow = action.onlineNow
       return state
     case 'SEARCH_USERS_ERROR':
       return state
