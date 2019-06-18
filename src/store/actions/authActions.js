@@ -20,9 +20,10 @@ export const signOut = () => {
     const firebase = getFirebase()
     firebase.auth().signOut()  
     .then(() => 
-    {
-      dispatch({ type: "SIGN_OUT_SUCCESS" }
+    { 
+      dispatch({ type: "SIGN_OUT_SUCCESS" } 
       );
+      window.location.replace("/signin")
     }).catch((err) => {
       dispatch({ type: "SIGN_OUT_ERROR", err})
     })
