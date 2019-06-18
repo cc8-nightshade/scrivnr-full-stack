@@ -45,7 +45,8 @@ export const signUp = (credentials) => {
           uid: cred.user.uid,
           firstName: credentials.firstName,
           lastName: credentials.lastName,
-          email: cred.user.email
+          email: cred.user.email,
+          contacts: []
         })
       })
     .then(() => 

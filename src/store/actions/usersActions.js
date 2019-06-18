@@ -18,9 +18,9 @@ export const getUsers = () => {
   };
 };
 
-export const getOnlineUsers = (onlineUsers) => {
+export const getOnlineUsers = (onlineNow) => {
   return (dispatch, getState) => {
-    dispatch({ type: "ONLINE_USERS", onlineUsers });
+    dispatch({ type: "ONLINE_USERS", onlineNow });
   };
 };
 

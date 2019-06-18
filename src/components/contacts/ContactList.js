@@ -1,21 +1,16 @@
 import React, { Component } from "react";
-import Contact from "./Contact";
 import { connect } from "react-redux";
-import { compose } from "react";
-import { firestoreConnect } from "react-redux-firebase";
 
 import {
   getUserInfoByCurrentUser,
   getUsers,
   getOnlineUsers,
-  searchUsers
 } from "../../store/actions/usersActions";
 import {
   getContactsByCurrentUser,
   deleteContact
 } from "../../store/actions/contactsActions";
 import { Redirect } from "react-router-dom";
-import AddContact from "./AddContact";
 import SearchUsers from "./SearchUsers";
 import io from "socket.io-client";
 import Recorder from "opus-recorder";
@@ -40,6 +35,7 @@ class ContactList extends Component {
     this.props.getContactsByCurrentUser();
     this.props.getUsers();
     this.sendUserInfoToServer();
+
   }
 
   updateState = event => {
@@ -64,9 +60,9 @@ class ContactList extends Component {
       tempSocket.on("message", messageData => {
         alert(messageData);
       });
-      tempSocket.on("online-users", userArray => {
+      tempSocket.on("online-users", onlineNow => {
         // Get List From Ian
-        // this.props.getOnlineUsers(onlineUsers)
+        this.props.getOnlineUsers(onlineNow)
       });
       tempSocket.on("calling", (callingUser, callingSocket) => {
         if (
@@ -106,6 +102,7 @@ class ContactList extends Component {
       tempSocket.on("hang-up", () => {
         this.endCall();
       });
+
     }
 
     // Store configured socket in state
@@ -117,6 +114,7 @@ class ContactList extends Component {
     // this is where get from redux
 
     this.state.mySocket.emit("initialize", this.props.auth.email);
+    this.state.mySocket.emit("get-online-users");
 
   };
 
@@ -387,7 +385,8 @@ class ContactList extends Component {
     }
   };
 
-  bookmarkBtn() {
+  bookmarkBtn(currentUserEmail) {
+    console.log(currentUserEmail)
     this.state.mySocket.emit("bookmark");
   }
 
@@ -400,7 +399,6 @@ class ContactList extends Component {
     if (!auth.uid) {
       return <Redirect to="/signin" />;
     }
-    // console.log(firebase.setListener('users'))
     return (
       <div className="contact-video wrapper container">
       
@@ -413,11 +411,9 @@ class ContactList extends Component {
 
           <div>
             <ul className="collection with-header">
-              <li class="collection-header">
+              <li className="collection-header">
                 <h5>Online Now</h5>
               </li>
-
-              {/* displays all the contacts online now */}
               {contacts &&
                 contacts.map((contact, index) => {
                   if (onlineNow.includes(contact.email)) {
@@ -425,93 +421,65 @@ class ContactList extends Component {
                     return (
                       <li key={index} className="collection-item">
                         {contact.firstName} {contact.lastName}
-                        <i
-                          className="secondary-content material-icons"
-                          onClick={() => this.startCall(contact.email)}
-                        >
+                        <i className="secondary-content material-icons buttons"
+                            onClick={() => this.startCall(contact.email)}>
                           call
                         </i>
-                        <i
-                          className="secondary-content material-icons"
-                          onClick={() => {
+                        <i className="secondary-content material-icons buttons"
+                            onClick={() => {
                             this.props.deleteContact(contact.email, auth.uid);
                             this.updateState();
-                          }}
-                        >
-                          delete
-                        </i>{" "}
+                          }}>delete
+                        </i>
                       </li>
-                      // <div onClick={() => {this.props.deleteContact(contact.email, auth.uid);this.updateState()}}>Delete</div>
                     );
                   }
                 })}
             </ul>
 
             <ul className="collection with-header">
-              <li class="collection-header">
+              <li className="collection-header">
                 <h5>Offline</h5>
               </li>
               {contacts &&
                 contacts.map((contact, index) => {
                   if (!onlineNow.includes(contact.email)) {
                     return (
-                      <li key={index} className="collection-item">
-                        {contact.firstName} {contact.lastName}
-                        <i className="secondary-content material-icons">
-                          not_interested
-                        </i>
-                        <i
-                          className="secondary-content material-icons"
-                          onClick={() => {
-                            this.props.deleteContact(contact.email, auth.uid);
-                            this.updateState();
-                          }}
-                        >
-                          delete
-                        </i>{" "}
-                      </li>
+                    <li key={index} className="collection-item">
+                      {contact.firstName} {contact.lastName}
+                      <i className="secondary-content material-icons buttons">
+                        not_interested
+                      </i>
+                      <i className="secondary-content material-icons buttons"
+                        onClick={() => {
+                        this.props.deleteContact(contact.email, auth.uid);
+                        this.updateState();}}>delete
+                      </i>
+                    </li>
                     );
                   }
                 })}
             </ul>
           </div>
         </div>
-
-
         {/* CONTACTS ENDS */}
-        {/* <p>{contacts.uid}</p> */}
+
+        {/* BUTTONS START */}
           <div className="container video-hangup-wrapper ">
-            {/* <div onClick={this.initialConnect}>Click me to connect to socket.io</div> */}
             <div className="camera-box">
               <video id="received_video" autoPlay />
               <video id="local_video" autoPlay muted />
             </div>
             <div className="">
-              {/* <button onClick={() => this.startCall()} className="">
-                Start Chat
-              </button> */}
-              {/* <button onClick={this.acceptCall} className="waves-effect waves-light btn-large">Accept Call</button> */}
-              <button id="hangup-button" className="btn hangup" onClick={this.hangUpCall}>
+              <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
                 Hang Up
               </button>
-              {/* <button id="record" onClick={this.startRecording}>
-                record
+              <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={() => this.bookmarkBtn(this.props.auth.email)}>
+                Bookmark
               </button>
-              <button id="stop-recording" onClick={this.stopRecording}>
-                Stop
-              </button> */}
             </div>
           </div>
-        
-
-        {/* {users &&
-          users.map((contact, index) => {
-            return <Contact contactInfo={contact} key={index} />;
-          })}
-        <button className="btn" onClick={this.clickhandler}>
-          Add new contact
-        </button>
-        {form} */}
+        {/* BUTTONS END */}
       </div>
     );
   }
@@ -522,10 +490,9 @@ const mapStateToProps = state => {
     users: state.users.users,
     currentUserInfo: state.users.userInfo,
     contacts: state.contacts.contactArray,
-    onlineNow: state.users.onlineUsers,
+    onlineNow: state.users.onlineNow,
     auth: state.firebase.auth,
     profile: state.firebase.profile
-
   };
 };
 
