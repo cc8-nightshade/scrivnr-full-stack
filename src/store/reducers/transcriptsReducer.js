@@ -4,7 +4,7 @@ const UPDATE_QUESTIONABLE = "transcripts/UPDATE_QUESTIONABLE";
 const intitialState = {
   transcripts: [],
   transcript: {},
-  selectedIndex: 0
+  selectedIndex: null
 };
 
 const transcriptReducer = (state = intitialState, action) => {

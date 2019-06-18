@@ -58,7 +58,7 @@ export const getTranscripts = (email) => {
 export const setTranscript = (transcript, index) => {
   //const transcript = {}
   console.log("set transcript");
-  //console.log(getState);
+  console.log("index:", index);
   return {type: "transcripts/SET_TRANSCRIPT", transcript, index};
 }
 
