@@ -7,7 +7,6 @@ import {
 } from "../../store/actions/transcriptsActions";
 import moment from "moment";
 import "./TranscriptDetail.css";
-import { isMetaProperty } from "@babel/types";
 
 class TranscriptList extends Component {
 
@@ -43,7 +42,8 @@ class TranscriptList extends Component {
                       this.selectItem(index);
                     }}
                   >
-                    {moment(item.startDate.toDate()).format("YYYY/MM/DD HH:mm")}
+                    {moment(item.startDate.toDate()).format("YYYY/MM/DD HH:mm")} <br />
+                    {this.props.auth.email === item.caller ? item.receiver : item.caller}
                   </li>
                 ))}
             </ul>
@@ -63,7 +63,8 @@ class TranscriptList extends Component {
                           <span className="bookmark">Bookmark</span>
                         </li>
                       );
-                    } else {
+                    } else if (item.bookmark && transcript.caller !== item.speaker){}
+                    else {
                       const time = new Date(transcript.startDate.toDate());
                       time.setSeconds(time.getSeconds() + item.time);
                       return (
@@ -88,7 +89,7 @@ class TranscriptList extends Component {
                                   <input 
                                       type="checkbox" 
                                       className="filled-in" 
-                                      checked={!item.questionable}
+                                      checked={item.questionable}
                                       onChange={() => {this.toggleItem(index)}}/>
                                   <span />
                             </label>
