@@ -10,7 +10,7 @@ class SignIn extends Component {
   }
 
   componentDidMount(){
-
+    // window.location.reload()
   }
 
     // // Initialize Socket
