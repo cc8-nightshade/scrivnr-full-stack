@@ -4,12 +4,15 @@ const morgan = require("morgan");
 const PORT = process.env.PORT || 9000;
 // const speech = require('@google-cloud/speech');
 const fs = require("fs");
+const history = require('connect-history-api-fallback');
+
 
 
 //var app = express.createServer(credentials);
 
 
 const app = express();
+app.use(history());
 app.use(
   morgan(
     ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :response-time ms'

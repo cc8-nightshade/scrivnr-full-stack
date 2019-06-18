@@ -5,6 +5,7 @@
   "dependencies": {
     "@cleandersonlobo/react-mic": "^1.1.1",
     "@google-cloud/speech": "^3.2.0",
+    "connect-history-api-fallback": "^1.6.0",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "firebase": "^6.1.1",
