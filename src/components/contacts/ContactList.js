@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-
 import {
   getUserInfoByCurrentUser,
   getUsers,
@@ -10,10 +9,13 @@ import {
   getContactsByCurrentUser,
   deleteContact
 } from "../../store/actions/contactsActions";
+import { updateCallingStatus, getCallingStatus } from '../../store/actions/callerActions'
 import { Redirect } from "react-router-dom";
 import SearchUsers from "./SearchUsers";
 import io from "socket.io-client";
 import Recorder from "opus-recorder";
+import { exportDefaultSpecifier } from "@babel/types";
+import phone from '../../images/phone.gif'
 
 class ContactList extends Component {
   constructor(props) {
@@ -34,6 +36,7 @@ class ContactList extends Component {
     this.props.getUserInfoByCurrentUser();
     this.props.getContactsByCurrentUser();
     this.props.getUsers();
+    this.props.getCallingStatus();
     this.sendUserInfoToServer();
 
   }
@@ -65,6 +68,7 @@ class ContactList extends Component {
         this.props.getOnlineUsers(onlineNow)
       });
       tempSocket.on("calling", (callingUser, callingSocket) => {
+        this.props.updateCallingStatus('beingCalled')
         if (
           window.confirm(`Would you like to accept a call from ${callingUser}?`)
         ) {
@@ -83,6 +87,7 @@ class ContactList extends Component {
       });
 
       tempSocket.on("rtc-offer", (callingUser, callingSocket, offerData) => {
+        this.props.updateCallingStatus('inCall')
         console.log("receiving offer", offerData);
         if (this.state.myPeerConnection === undefined) {
           console.log("Continuing to process processing offer", offerData);
@@ -90,10 +95,12 @@ class ContactList extends Component {
         }
       });
       tempSocket.on("reject-call", receiverName => {
+        this.props.updateCallingStatus('notInCall')
         alert(`${receiverName} does not exist or rejected your call.`);
         this.endCall();
       });
       tempSocket.on("rtc-answer", answerData => {
+        this.props.updateCallingStatus('inCall')
         this.handleAnswerMessage(answerData);
       });
       tempSocket.on("new-ice-candidate", iceCandidate => {
@@ -119,6 +126,8 @@ class ContactList extends Component {
   };
 
   startCall = async receiverName => {
+    this.props.updateCallingStatus('calling')
+
     // const receiverName = prompt('Who do you want to call?', 'Voldemort');
     console.log(receiverName);
     if (receiverName !== "" && receiverName !== null) {
@@ -309,6 +318,7 @@ class ContactList extends Component {
   // Refactored out of hangUpCall because it needs to be run when the other party hangs up
   endCall = () => {
     console.log("Shutting down call.");
+    this.props.updateCallingStatus('notInCall')
     if (this.state.mediaRecorder) {
       this.state.mediaRecorder.stop();
 
@@ -395,15 +405,85 @@ class ContactList extends Component {
     if (this.state.showCreateForm) {
       // form = <CreateContact />;
     }
-    const { auth, contacts, onlineNow } = this.props;
+    const { auth, contacts, onlineNow, status } = this.props;
+    console.log(status)
     if (!auth.uid) {
       return <Redirect to="/signin" />;
     }
+    let buttons;
+    if (status == "notInCall") {
+      buttons = (
+        <div className="video-hangup-wrapper"></div> 
+      )
+    } else if( status == 'calling'){
+      buttons = (
+        <div className="video-hangup-wrapper">
+          <img src={phone} alt="phone"/>
+        </div>
+      )
+    } else if( status == 'calling-receiving'){
+      buttons = (
+        <div className="video-hangup-wrapper">
+          <img src={phone} alt="phone"/>
+        </div>
+      )
+
+    } else if( status == "beingCalled") {
+      buttons = (
+        // BUTTONS START
+        <div className="video-hangup-wrapper ">
+          <div className="image-wrapper">
+            <img src={phone} alt="phone"/>
+          </div>
+          <div className="button-wrapper">
+            <button id="answer-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
+              Answer
+            </button>
+            <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
+              Hang Up
+            </button>
+            <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={() => this.bookmarkBtn(this.props.auth.email)}>
+              Bookmark
+            </button>
+          </div>
+          <div className="camera-box">
+            <video id="received_video" autoPlay />
+            <video id="local_video" autoPlay muted />
+          </div>
+        </div>
+      // BUTTONS END 
+      )
+    } else if( status == "inCall") {
+      buttons = (
+        // BUTTONS START
+        <div className="video-hangup-wrapper ">
+          <div className="camera-box">
+            <video id="received_video" autoPlay />
+            <video id="local_video" autoPlay muted />
+          </div>
+          <div className="image-wrapper">
+            <img src={phone} alt="phone"/>
+          </div>
+          <div className="button-wrapper">
+            <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
+              Hang Up
+            </button>
+            <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={() => this.bookmarkBtn(this.props.auth.email)}>
+              Bookmark
+            </button>
+
+          </div>
+        </div>
+      // BUTTONS END 
+      )
+    }
+
+
     return (
       <div className="contact-video wrapper container">
-      
+         
         {/* CONTACTS START */}
-        <div className="contact-list container">
+        <div className="contact-list">
           <h6 className="user-header">Logged in as: {this.props.profile.firstName}</h6>
           <div className="search-users">
             <SearchUsers />
@@ -463,23 +543,8 @@ class ContactList extends Component {
           </div>
         </div>
         {/* CONTACTS ENDS */}
+        { buttons }
 
-        {/* BUTTONS START */}
-          <div className="container video-hangup-wrapper ">
-            <div className="camera-box">
-              <video id="received_video" autoPlay />
-              <video id="local_video" autoPlay muted />
-            </div>
-            <div className="">
-              <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
-                Hang Up
-              </button>
-              <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={() => this.bookmarkBtn(this.props.auth.email)}>
-                Bookmark
-              </button>
-            </div>
-          </div>
-        {/* BUTTONS END */}
       </div>
     );
   }
@@ -487,6 +552,7 @@ class ContactList extends Component {
 
 const mapStateToProps = state => {
   return {
+    status: state.callerStatus.status,
     users: state.users.users,
     currentUserInfo: state.users.userInfo,
     contacts: state.contacts.contactArray,
@@ -503,9 +569,15 @@ const mapDispatchToProps = dispatch => {
     getUsers: () => dispatch(getUsers()),
     getOnlineUsers: onlineUsers => dispatch(getOnlineUsers(onlineUsers)),
     deleteContact: (searchedEmail, currentUserUid) =>
-    dispatch(deleteContact(searchedEmail, currentUserUid))
+    dispatch(deleteContact(searchedEmail, currentUserUid)),
+    getCallingStatus: () => dispatch(getCallingStatus()),
+    updateCallingStatus: (status) => dispatch(updateCallingStatus(status))
   };
 };
+
+// 'notInCall', 'calling' -... repeating, 'beingCalled' - hangup+bookmarks, answer button,  'inCall' - hangup+bookmarks
+
+// disabling call buttons
 
 export default connect(
   mapStateToProps,
