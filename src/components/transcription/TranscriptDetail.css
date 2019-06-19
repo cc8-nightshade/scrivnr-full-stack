@@ -42,16 +42,16 @@ body {
   padding: 10px 30px;
 }
 
-.dialogueDetail .inner{
-    width: 100%;
-    max-width: 600px;
+.dialogueDetail .inner {
+  width: 100%;
+  max-width: 600px;
 }
 
 .alignLeft .name {
   display: none;
 }
 ul.listWrapper {
-    padding-left: 10px;
+  padding-left: 10px;
 }
 .listWrapper li {
   cursor: pointer;
@@ -86,9 +86,9 @@ ul.listWrapper {
   display: inline-block;
   max-width: 50%;
 }
-.textBox input+span {
-    position: relative;
-    top: 8px;
+.textBox input + span {
+  position: relative;
+  top: 8px;
 }
 .bookmark {
   margin: 0 auto;
@@ -120,15 +120,15 @@ ul.listWrapper {
   top: -3px;
 }
 .asideHead {
-    font-size: 30px;
-    margin: 0;
-    text-align:center;
-    padding: 10px 0;
+  font-size: 30px;
+  margin: 0;
+  text-align: center;
+  padding: 10px 0;
 }
-.dialogueWrapper{
-    display:flex;
-    width:100%;
-    height:100%;
+.dialogueWrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
 .time {
   position: relative;
@@ -148,31 +148,43 @@ ul.listWrapper {
   width: 15px;
   height: 15px;
 }
+[type="checkbox"].filled-in:checked+span:not(.lever):after{
+  border: 2px solid #cb0000 !important;
+  background-color: #cb0000 !important;
+}
 [type="checkbox"].filled-in:checked + span:not(.lever):before {
-  top: -3px;
-  left: -1px;
+  top: -10px;
+  left: 2px;
+  overflow: hidden;
+  content: "?";
+  color: #fff;
+  border: 2px solid transparent !important;
+  transform: none !important;
+  width: 15px !important;
+  height: 23px !important;
+
 }
 [type="checkbox"]:checked ~ .textBox {
   color: #fff;
 }
 
 @media screen and (max-width: 600px) {
-   .dialogueList {
-       height: 30%;
-       width: 100%;
-       overflow-y: auto;
-   }
-   .dialogueDetail {
-       height: 60%;
-       width: 100%;
-       overflow-y: auto;
-   }
-   .dialogueWrapper {
-       height: 100%;
-       display: block;
-   }
-   .container {
-     margin: 0;
-     width: 100%;
-   }
+  .dialogueList {
+    height: 30%;
+    width: 100%;
+    overflow-y: auto;
   }
+  .dialogueDetail {
+    height: 60%;
+    width: 100%;
+    overflow-y: auto;
+  }
+  .dialogueWrapper {
+    height: 100%;
+    display: block;
+  }
+  .container {
+    margin: 0;
+    width: 100%;
+  }
+}
