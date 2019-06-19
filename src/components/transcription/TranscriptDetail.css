@@ -22,6 +22,7 @@ body {
 }
 .alignRight .textBox {
   background-color: #dbf8d4;
+  text-align: left;
 }
 .ft-green {
   color: #2dce8a;
