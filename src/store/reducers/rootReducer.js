@@ -4,6 +4,7 @@ import contactsReducer from './contactsReducer'
 import transcriptsReducer from './transcriptsReducer';
 import usersReducer from './usersReducer'
 import videoReducer from './videoReducer';
+import callerReducer from './callerReducer'
 import { firebaseReducer } from 'react-redux-firebase'
 import { firestoreReducer } from 'redux-firestore'
 
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   users: usersReducer,
   video: videoReducer,
+  callerStatus: callerReducer,
   firebase: firebaseReducer,
   firestore: firestoreReducer
 })

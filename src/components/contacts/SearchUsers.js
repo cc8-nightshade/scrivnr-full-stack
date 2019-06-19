@@ -30,6 +30,7 @@ export class SearchUsers extends Component {
 
   render() {
     const { searchedEmail, auth } = this.props
+    
     return (
       <div className="">
         <form onSubmit={this.handleSubmit} className="white">
@@ -43,7 +44,7 @@ export class SearchUsers extends Component {
         </form>
         { searchedEmail &&
           <ul className="collection">
-            <li className="collection-item"  >{searchedEmail[0].userName} {searchedEmail[0].email}
+            <li className="collection-item"  >{searchedEmail[0].firstName} {searchedEmail[0].email}
             <i onClick={() => {this.props.addToContacts(searchedEmail, auth.uid); this.updateState()}} className="secondary-content material-icons">person_add</i>
             </li>
             {/* <div onClick={() => this.props.deleteContact(searchedEmail[0].email, auth.uid)} >Delete</div> */}
