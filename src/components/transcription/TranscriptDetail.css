@@ -154,14 +154,16 @@ ul.listWrapper {
 }
 [type="checkbox"].filled-in:checked + span:not(.lever):before {
   top: -10px;
-  left: 2px;
+  left: 1px;
   overflow: hidden;
   content: "?";
   color: #fff;
   border: 2px solid transparent !important;
   transform: none !important;
-  width: 15px !important;
+  width: 12px !important;
   height: 23px !important;
+  font-weight: bold;
+  text-align:center;
 
 }
 [type="checkbox"]:checked ~ .textBox {
