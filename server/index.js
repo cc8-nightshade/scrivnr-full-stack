@@ -22,26 +22,27 @@ app.use(
 app.use(express.static('build'));
 app.use("/audio", express.static('audio'));
 
+let io;
 
-// HTTP VERSION
-console.log("Starting server...");
-const server = app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}!`);
-});
-let io = socket(server);
-// END HTTP VERSION
-
-// HTTPS version
-// let https = require('https');
-// const privateKey = fs.readFileSync('./server/ssl/server.key');
-// const certificate = fs.readFileSync('./server/ssl/server.cert');
-// const credentials = {key: privateKey, cert: certificate};
-// let httpsServer = https.createServer(credentials, app);
-// httpsServer.listen(PORT);
-// console.log(`httpsServer listening on port ${PORT}!`);
-// let io = socket(httpsServer);
-// console.log(`Attached socket to httpsServer!`);
-// END HTTPS CODE
+if(process.env.ISHEROKU) {
+  // HTTP VERSION
+  console.log("Starting server...");
+  const server = app.listen(PORT, () => {
+    console.log(`App listening on port ${PORT}!`);
+  });
+  io = socket(server);
+} else {
+  // HTTPS version
+  let https = require('https');
+  const privateKey = fs.readFileSync('./server/ssl/server.key');
+  const certificate = fs.readFileSync('./server/ssl/server.cert');
+  const credentials = {key: privateKey, cert: certificate};
+  let httpsServer = https.createServer(credentials, app);
+  httpsServer.listen(PORT);
+  console.log(`httpsServer listening on port ${PORT}!`);
+  io = socket(httpsServer);
+  console.log(`Attached socket to httpsServer!`);
+}
 
 const {
   initializeConversationData,

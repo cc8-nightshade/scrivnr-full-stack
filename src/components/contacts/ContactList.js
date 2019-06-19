@@ -65,22 +65,10 @@ class ContactList extends Component {
         this.props.getOnlineUsers(onlineNow)
       });
       tempSocket.on("calling", (callingUser, callingSocket) => {
-        if (
-          window.confirm(`Would you like to accept a call from ${callingUser}?`)
-        ) {
-          console.log("Accepting call");
-          this.state.mySocket.emit("accept-call", callingUser, callingSocket);
-        } else {
-          // If the user rejects call
-          console.log("Rejecting call");
-          this.state.mySocket.emit(
-            "reject-call",
-            this.props.auth.email,
-            callingSocket
-          );
-          // TODO Destroy recorder!
-        }
+        this.checkAcceptCall(callingUser, callingSocket);
       });
+
+
 
       tempSocket.on("rtc-offer", (callingUser, callingSocket, offerData) => {
         console.log("receiving offer", offerData);
@@ -117,6 +105,24 @@ class ContactList extends Component {
     this.state.mySocket.emit("get-online-users");
 
   };
+
+  checkAcceptCall = (callingUser, callingSocket) => {
+    if (
+      window.confirm(`Would you like to accept a call from ${callingUser}?`)
+    ) {
+      console.log("Accepting call");
+      this.state.mySocket.emit("accept-call", callingUser, callingSocket);
+    } else {
+      // If the user rejects call
+      console.log("Rejecting call");
+      this.state.mySocket.emit(
+        "reject-call",
+        this.props.auth.email,
+        callingSocket
+      );
+      // TODO Destroy recorder!
+    }
+  }
 
   startCall = async receiverName => {
     // const receiverName = prompt('Who do you want to call?', 'Voldemort');
