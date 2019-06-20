@@ -2,15 +2,10 @@ const express = require("express");
 const socket = require("socket.io");
 const morgan = require("morgan");
 const PORT = process.env.PORT || 9000;
-// const speech = require('@google-cloud/speech');
 const fs = require("fs");
 const history = require('connect-history-api-fallback');
 
-
-
-//var app = express.createServer(credentials);
-
-
+// Creating Server, logging
 const app = express();
 app.use(history());
 app.use(
@@ -18,12 +13,12 @@ app.use(
     ':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :response-time ms'
   )
 );
-// Serve static HTML page
+    // Serve static HTML page
 app.use(express.static('build'));
 app.use("/audio", express.static('audio'));
 
+// Starting HTTP or HTTPS, depending on environment
 let io;
-
 if(process.env.ISHEROKU) {
   // HTTP VERSION
   console.log("Starting server...");
@@ -53,15 +48,29 @@ const {
   createOnlineUserList
 } = require("./serverutil.js");
 
+// State objects used to hold server data
 let connectedUsers = {};
-let bufferData = {};
-let conversations = {};
 let offers = {};
-let bookmarks = {};
+let conversations = {};
+let bufferData = {};
+let processing = {};
 
+// Definition of server-side socket
 io.on("connection", (socket) => {
+
   socket.on("disconnect", () => {
-    delete connectedUsers[socket.id];
+    // Clear data if remaining
+    if (bufferData[socket.id]) {
+      delete bufferData[socket.id];
+    }
+    if (offers[socket.id]) {
+      delete offers[socket.id];
+    }
+    // Clear from connected users
+    if (connectedUsers[socket.id]) {
+      delete connectedUsers[socket.id];
+    }
+    // Update other online users with 
     io.emit("online-users", 
       createOnlineUserList(socket.id, connectedUsers)
     );
@@ -70,6 +79,7 @@ io.on("connection", (socket) => {
   
   socket.on("initialize", userName => {
     console.log("Initialization (User, socket):", userName, socket.id);
+    // Delete user first from connectedUsers if was just connected
     for (let user in connectedUsers) {
       if (connectedUsers[user]['userName'] === userName) {
         console.log(`User --${userName}-- reconnecting.`);
@@ -119,7 +129,6 @@ io.on("connection", (socket) => {
 
   socket.on("accept-call", (callingUser, callingSocket) => {
     console.log(`call from ${callingUser} accepted by ${socket.id}`);
-    let receiverStartTime = new Date();
     // send offer to accepting user
     io.to(socket.id).emit(
       "rtc-offer", 
@@ -134,48 +143,50 @@ io.on("connection", (socket) => {
       }
     }
 
-    // Initialize bookmarks object: caller
-    bookmarks[callingSocket] = {
-      startTime: offers[callingSocket]['initiateTime'],
-      bookmarks: []
-    };
-    // Initialize bookmarks object: receiver
-    bookmarks[socket.id] = {
-      startTime: receiverStartTime,
-      bookmarks: []
-    };
+  });
+    
+  socket.on("reject-call", (receiverName, callingSocket) => {
+    console.log(`Transferring REJECT message from --${receiverName}-- to --${connectedUsers[callingSocket]["userName"]}--`);
+    // Tell calling user
+    io.to(callingSocket).emit("reject-call", receiverName);
+    // Clear offer data
+    delete offers[callingSocket];
+    setTimeout(() => {
+      delete bufferData[callingSocket];
+    }, 3000);
+  }); 
 
+  socket.on("rtc-answer", (callingSocket, answer) => {
+    // record time first
+    let pickUpDateTime = new Date();
+    
+    console.log(`transmitting answer from ${socket.id} to ${callingSocket}`);
+    io.to(callingSocket).emit("rtc-answer", answer);
+    
     // create new Conversation Object
     const {newID, newConversation} = 
       initializeConversationData(
         offers[callingSocket]['initiateTime'],
+        pickUpDateTime,
         connectedUsers[callingSocket]['userName'], 
-        connectedUsers[socket.id]['userName']
+        callingSocket,
+        connectedUsers[socket.id]['userName'],
+        socket.id
       );
-      
-      conversations[newID] = newConversation;
-      // Refresh user tracking data: calling user
-      connectedUsers[callingSocket]["partnerSocket"] = socket.id;
-      connectedUsers[callingSocket]["conversationID"] = newID;
-      // Refresh user tracking data: receiving user
-      connectedUsers[socket.id]["partnerSocket"] = callingSocket;
-      connectedUsers[socket.id]["conversationID"] = newID;
-      console.log(`New conversation:`, conversations[newID]);
-      console.log(`Connected Users:`, connectedUsers);
-      
-      // clean up offer data
-      delete offers[callingSocket];
-    });
     
-  socket.on("reject-call", (receiverName, callerSocket) => {
-    console.log(`Transferring REJECT message from --${receiverName}-- to --${connectedUsers[callerSocket]["userName"]}--`);
-    delete bufferData[callerSocket];
-    io.to(callerSocket).emit("reject-call", receiverName);
-  }); 
-
-  socket.on("rtc-answer", (callerSocket, answer) => {
-    console.log(`transmitting answer from ${socket.id} to ${callerSocket}`);
-    io.to(callerSocket).emit("rtc-answer", answer);
+    // insert new conversation in the state
+    conversations[newID] = newConversation;
+    // Refresh user tracking data: calling user
+    connectedUsers[callingSocket]["partnerSocket"] = socket.id;
+    connectedUsers[callingSocket]["conversationID"] = newID;
+    // Refresh user tracking data: receiving user
+    connectedUsers[socket.id]["partnerSocket"] = callingSocket;
+    connectedUsers[socket.id]["conversationID"] = newID;
+    console.log(`New conversation:`, conversations[newID]);
+    console.log(`Connected Users:`, connectedUsers);
+    
+    // clean up offer data
+    delete offers[callingSocket];
   });
 
   socket.on("new-ice-candidate", (candidate) => {
@@ -191,17 +202,24 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("bookmark", (userName) => {
+  socket.on("bookmark", () => {
     let bookmarkDateTime = new Date();
-    let bookmarkTime = Math.round((bookmarkDateTime - bookmarks[socket.id]['startTime']) / 100) / 10;
-    bookmarks[socket.id]['bookmarks'].push(bookmarkTime);
-    console.log(`Bookmark -- User (${socket.id}) Time (${bookmarkTime})`);
+    // If conversation exists, continue with processing
+    if(conversations[connectedUsers[socket.id]['conversationID']]) {
+      let conversation = conversations[connectedUsers[socket.id]['conversationID']];
+      let bookmarkTime = Math.round((bookmarkDateTime - conversation.bookmarks[socket.id]['startTime']) / 100) / 10;
+      conversation.bookmarks[socket.id]['bookmarks'].push(bookmarkTime);
+      console.log(`Bookmark -- User (${socket.id}) Time (${bookmarkTime})`);
+    }
   });
 
   socket.on("hang-up", () => {
-    console.log("Following connection is hanging up", socket.id);
-    let targetSocket = connectedUsers[socket.id]["partnerSocket"];
-    io.to(targetSocket).emit("hang-up");
+    if (connectedUsers[socket.id]["partnerSocket"] !== null) {
+      console.log("Following connection is hanging up", socket.id);
+      // Forward Hang-up to partnerSocket
+      let targetSocket = connectedUsers[socket.id]["partnerSocket"];
+      io.to(targetSocket).emit("hang-up");
+    }
   });
   
   socket.on("send-blob", (base64data) => {
@@ -210,7 +228,6 @@ io.on("connection", (socket) => {
     }
     bufferData[socket.id].push(Buffer.from(base64data, "base64"));
     console.log(`User ${socket.id} has -- ${bufferData[socket.id].length} -- pieces of data`)
-    // console.log(bufferData[socket.id][bufferData[socket.id].length - 1]);
   });
   
   socket.on("reset-recording", () => {
@@ -222,60 +239,66 @@ io.on("connection", (socket) => {
   });
 
   socket.on("end-recording", async () => {
+    // Extract important properties for reference, then clear from connectedUsers (Allows for next conversation)
+    let conversationID = connectedUsers[socket.id]['conversationID'];
+    let partnerSocket = connectedUsers[socket.id]['partnerSocket'];
+    connectedUsers[socket.id]['conversationID'] = null;
+    connectedUsers[socket.id]['partnerSocket'] = null; 
+
+    // If conversation has yet to be moved to processing, move it
+    if (conversations[conversationID] !== undefined) {
+      processing[conversationID] = JSON.parse(JSON.stringify(conversations[conversationID]));
+      delete conversations[conversationID];
+      console.log(`moved conversation ${conversationID} from current data, leaving ${Object.keys(conversations)}`);
+    }
+    
+    let currentConversation = processing[conversationID];
+    
     if (bufferData[socket.id] !== undefined) {
       var allAudio = Buffer.concat(bufferData[socket.id]);
+      console.log(`Sending ${socket.id} data (length ${allAudio.length}) to Google`);
+      delete bufferData[socket.id];
+      console.log(`deleted user ${socket.id} from recording data, leaving ${Object.keys(bufferData)}`);
       let googleResult = await getTranscription(allAudio.toString("base64"), socket.id).catch(console.error);
-      googleResult = JSON.parse(googleResult);
-      
-      let lastUser = false;
-      let currentConversation = conversations[connectedUsers[socket.id]['conversationID']];
-      if (currentConversation.speech.length > 0) {
-        lastUser = true;
-      }
 
+      let lastUser = (currentConversation.speech.length > 0) ? true : false;
+        
       // for adjustment of times for caller vs receiver
-      let recordStartTime = 0; // for receiver, because we want all of their speech
+          // for receiver, because we want all of their speech
+      let transcribeStartTime = 0; 
+          // for caller, pass time of pickup so we can delete their pre-pickup statements
       if (connectedUsers[socket.id]['userName'] === currentConversation.caller) {
-        // for caller, do not record audio before pickup
-        recordStartTime = currentConversation.timeToPickUp;
+        transcribeStartTime = currentConversation.timeToPickUp;
       }
-
+      console.log(`Received Google Result for ${socket.id}`);
       addSpeech(
         connectedUsers[socket.id]['userName'],
         currentConversation, 
         extractConversationData(
           connectedUsers[socket.id]['userName'], 
-          recordStartTime,
+          transcribeStartTime,
           googleResult
         ),
-        bookmarks[socket.id]['bookmarks']
+        currentConversation.bookmarks[socket.id]['bookmarks']
       );
 
       if (lastUser) {
+        // Delete bookmark data from conversation before saving
+        delete currentConversation.bookmarks;
+        // Push transcription to Firebase
         console.log("Complete conversation after results", currentConversation);
         addDialogue(currentConversation);
+        
+        console.log("Deleting conversation ${conversationID} after processing");
+        delete processing[conversationID];
+
+        // Inform users
         console.log(`informing ${socket.id}`)
         io.to(socket.id).emit("message", "You're transcription is finished.");
-        console.log(`informing ${connectedUsers[socket.id]['partnerSocket']}`)
-        io.to(connectedUsers[socket.id]['partnerSocket']).emit("message", "You're transcription is finished.");
+        console.log(`informing ${partnerSocket}`)
+        io.to(partnerSocket).emit("message", "You're transcription is finished.");
       }
-      // Clear data from the server, reset the users' conversation data
-      delete bufferData[socket.id];
-      delete bookmarks[socket.id];
-      connectedUsers[socket.id]['conversationID'] = null;
-      connectedUsers[socket.id]['partnerSocket'] = null; 
-      console.log(`deleted user ${socket.id} from recording data, leaving ${Object.keys(bufferData)}`);
     }
-
   });
-  socket.on("end-recording-only", async () => {
-    if (bufferData[socket.id] !== undefined) {
-      var allAudio = Buffer.concat(bufferData[socket.id]);
-      fs.writeFileSync("./server/test.ogg", allAudio);
-      let googleResult = await getTranscription(allAudio.toString("base64"), socket.id).catch(console.error);
-      googleResult = JSON.parse(googleResult);
-      console.log(googleResult);
-    }
 
-  });
 });
