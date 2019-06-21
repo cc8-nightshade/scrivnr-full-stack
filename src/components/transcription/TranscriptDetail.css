@@ -37,7 +37,7 @@ body {
   background: #f8f8f8;
 }
 .dialogueDetail {
-  height: 100%;
+  height: calc(100% - 56px);
   width: calc(100% - 200px);
   overflow-y: auto;
   padding: 10px 30px;
@@ -178,7 +178,7 @@ ul.listWrapper {
     overflow-y: auto;
   }
   .dialogueDetail {
-    height: 60%;
+    height: calc(70% - 56px);
     width: 100%;
     overflow-y: auto;
   }
