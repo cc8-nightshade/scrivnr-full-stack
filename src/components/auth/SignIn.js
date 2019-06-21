@@ -1,57 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { signIn } from '../../store/actions/authActions'
-import { Redirect } from 'react-router-dom'
+import { Redirect, NavLink } from 'react-router-dom'
+import logo from '../../images/our-logo.png'
 
 class SignIn extends Component {
   state = {
     email: '',
     password: ''
   }
-
-  componentDidMount(){
-    // window.location.reload()
-  }
-
-    // // Initialize Socket
-    // const tempSocket = io.connect();
-    // // Initialize Socket Details
-    // {
-    //   tempSocket.on("message", (messageData) => {
-    //     alert(messageData);
-    //   });
-    //   tempSocket.on("rtc-offer", (callingUser, callingSocket, offerData) => {
-    //     console.log("receiving offer", offerData);
-    //     if (this.state.myPeerConnection === undefined) {
-    //       console.log("Continuing to process processing offer", offerData);
-    //       this.handleOfferMessage(callingUser, callingSocket, offerData);
-    //     }
-    //   });
-    //   tempSocket.on("reject-call", (receiverName) => {
-    //     alert(`${receiverName} does not exist or rejected your call.`);
-    //     this.endCall();
-    //   });
-    //   tempSocket.on("rtc-answer", (answerData) => {
-    //     this.handleAnswerMessage(answerData);
-    //   });
-    //   tempSocket.on("new-ice-candidate", (iceCandidate) => {
-    //     this.handleNewICECandidateMsg(iceCandidate);
-    //   });
-    //   tempSocket.on("hang-up", () => {
-    //     this.endCall();
-    //   });
-    // }
-
-    // // Store configured socket in state
-    // await this.setState({
-    //   mySocket: tempSocket
-    // });
-    // console.log("Initialized client-side socket: ", this.state.mySocket);
-    // // talk to socket server to say "I'm online"
-    // // this is where get from redux
-    // this.state.mySocket.emit("initialize", this.state.myName);
-
-
 
   handleChange = (event) => {
     this.setState({
@@ -69,7 +26,12 @@ class SignIn extends Component {
     const { authError, auth } = this.props
     if(auth.uid) return <Redirect to='/contacts'></Redirect>
     return (      
+
       <div className="container">
+        <div className="our-logo">
+          <img className="logo-img" src={logo} alt=""/>
+        </div>
+        <h5 className='slogan'>Don't lie! You said it..</h5>
         <form onSubmit={this.handleSubmit} className="white">
           <h5 className="grey-text text-darken-3">Log in</h5>
           <div className="input-field">
@@ -87,6 +49,11 @@ class SignIn extends Component {
             { authError ? <p>{ authError }</p> : null}
           </div>
         </form>
+        <div className="sign-up-redirect">
+          <p>If you don't have an account sign-up 
+            <span><NavLink to='/signup'> here</NavLink></span>
+          </p>
+        </div>
       </div>
     )
   }

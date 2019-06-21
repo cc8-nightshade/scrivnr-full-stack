@@ -6,12 +6,28 @@
 .brand-logo {
   margin-left: 30px;
 }
+
 /* NAVBAR */
 .signedin {
   margin-right: 20px;
 }
 
-/* VIDEO Component */
+/* SIGN-IN */
+
+.our-logo {
+  text-align: center;
+  margin: 50px;
+}
+.logo-img {
+  height: 150px;
+  width: 150px;
+}
+.slogan {
+  text-align: center;
+  margin: 10px;
+}
+
+/* CONTACTS */
 .contact-video {
   display: flex;
 }
@@ -38,19 +54,21 @@ i {
   padding-left: 20px;
 }
 
-.video-hangup-wrapper {
-  /* display: flex; */
-  /* align-items: center;
-  justify-content: space-around;
-  flex-direction: column; */
-}
-.button-wrapper {
+.button-call-wrapper {
   text-align: center;
+  width: 50%;
   /* margin-top: 500px; */
   /* display: flex; */
   /* align-items: center;
   justify-content: space-around;
   flex-direction: column; */
+}
+
+.button-video-items {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  padding-bottom: 250px;
 }
 
 .hangup {
@@ -59,8 +77,6 @@ i {
 }
 
 .camera-box {
-  /* background-color: bisque; */
-  /* margin-top: -400px; */
   width: 1px;
   height: 1px;
   overflow: hidden;
@@ -88,38 +104,8 @@ video {
   padding: 0;
 }
 
-/* .video-wrapper {
-  margin-top: 100px;
-} */
 
-/* .camera-box {
-  width: 100%;
-  height: 320px;
-  display: flex;
-  justify-content: space-evenly;
-} */
 
-#received_video {
-  /* background-color: black; */
-  /* width: 450px; */
-  /* height: 320px; */
-}
-/* width: 640px;
-height: 480px; */
-
-#local_video {
-  /* background-color: black; */
-  /* width: 450px; */
-  /* height: 320px; */
-}
-
-.button-wrapper {
-  /* margin-top: 20px;
-  display: flex;
-  justify-content: space-evenly; */
-}
-
-/* width: 50%; */
 @media screen and (max-width: 992px) {
   .brand-logo {
     margin-left: 30px;
@@ -130,12 +116,7 @@ height: 480px; */
   .brand-logo {
     margin-left: 30px;
   }
-  #local_video {
-    /* width: 350px; */
-  }
-  #received_video {
-    /* width: 350px; */
-  }
+
 }
 @media screen and (max-width: 826px) {
   .contact-video {
@@ -145,26 +126,22 @@ height: 480px; */
   .brand-logo {
     margin-left: 30px;
   }
-  #local_video {
-    width: 250px;
-  }
-  #received_video {
-    width: 250px;
-  }
 }
-@media screen and (max-width: 540px) {
-  /* .camera-box {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  } */
+
+@media screen and (max-width: 768px) {
   .contact-video {
     overflow-y: auto;
     height: calc(100% - 56px) !important;
     padding-bottom: 50px;
+  }
+  .button-call-wrapper{
+    width: 100%;
+  }
+  .button-video-items {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-bottom: 20px;
   }
   .brand-logo {
     margin-left: 10px;
@@ -175,25 +152,6 @@ height: 480px; */
   .contact-list {
     width: 100%;
   }
-  #local_video {
-    margin: 10px 0;
-    width: 100%;
-  }
-  #received_video {
-    margin: 10px 0;
-    width: 100%;
-  }
-  .button-wrapper {
-    /* display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center; */
-  }
-  /* button {
-    margin-bottom: 10px;
-    width: 50%;
-    height: 20px;
-  } */
   button {
     cursor: pointer;
   }
@@ -202,22 +160,3 @@ height: 480px; */
   }
 }
 
-/* MESSAGES component */
-.transcripts {
-  /* margin: 20px; */
-}
-.sendMessage {
-  widows: 40%;
-  height: 100px;
-  margin: 10px;
-
-  background-color: pink;
-  margin-left: -10px;
-}
-.receiveMessage {
-  widows: 40%;
-  height: 100px;
-  margin: 10px;
-  background-color: beige;
-  /* margin-right: 20px; */
-}
