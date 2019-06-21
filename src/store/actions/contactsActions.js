@@ -39,8 +39,7 @@ export const addToContacts = (searchedEmail, currentUserUid) => {
       const profilesArray = [];
       profiles.forEach(profile => {
         profile.forEach(querySnapshot => {
-          const data = querySnapshot.data();
-          profilesArray.push(data);
+          profilesArray.push(querySnapshot.data());
         });
       });
       const hasContact = profilesArray[1].contacts.filter(contact => {
@@ -51,14 +50,14 @@ export const addToContacts = (searchedEmail, currentUserUid) => {
       });
 
       if (hasContact.length === 0) {
-        let removedContact = { ...profilesArray[0] };
-        delete removedContact["contacts"];
-        profilesArray[1].contacts.push(removedContact);
+        let newContactData = { ...profilesArray[0] };
+        delete newContactData["contacts"];
+        profilesArray[1].contacts.push(newContactData);
       }
       if (hasContactTwo.length === 0) {
-        let removedContact = { ...profilesArray[1] };
-        delete removedContact["contacts"];
-        profilesArray[0].contacts.push(removedContact);
+        let newContactData = { ...profilesArray[1] };
+        delete newContactData["contacts"];
+        profilesArray[0].contacts.push(newContactData);
       }
 
       // console.log(profilesArray);
@@ -82,11 +81,11 @@ export const addToContacts = (searchedEmail, currentUserUid) => {
   };
 };
 
-export const deleteContact = (searchedEmail, currentUserUid) => {
+export const deleteContact = (searchedProfile, currentUserUid) => {
   return (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const userID = getState().firebase.auth.uid; // later for mapping userid to contacts
-    console.log(userID, searchedEmail);
+    console.log(userID, searchedProfile);
     Promise.all([
       firestore
         .collection("users")
@@ -94,7 +93,7 @@ export const deleteContact = (searchedEmail, currentUserUid) => {
         .get(),
       firestore
         .collection("users")
-        .where("uid", "==", searchedEmail.uid)
+        .where("uid", "==", searchedProfile.uid)
         .get()
     ])
     .then(profiles => {
@@ -107,23 +106,23 @@ export const deleteContact = (searchedEmail, currentUserUid) => {
       })
 
       
-        const currentFilteredContects = profilesArray[0].contacts.filter(item => {return item.uid !== searchedEmail.uid})
+        const currentFilteredContacts = profilesArray[0].contacts.filter(item => {return item.uid !== searchedProfile.uid})
         firestore
           .collection("users")
           .doc(userID)
           .update({
-            contacts: currentFilteredContects
+            contacts: currentFilteredContacts
           })
       
-        const oponentFilteredContects = profilesArray[1].contacts.filter(item => {return item.uid !== userID})
+        const otherUserFilteredContacts = profilesArray[1].contacts.filter(item => {return item.uid !== userID})
         firestore
           .collection("users")
-          .doc(searchedEmail.uid)
+          .doc(searchedProfile.uid)
           .update({
-            contacts: oponentFilteredContects
+            contacts: otherUserFilteredContacts
           })
         
-        dispatch({ type: "DELETE_CONTACT", currentFilteredContects });
+        dispatch({ type: "DELETE_CONTACT", currentFilteredContacts });
     })
     .catch(err => {
       dispatch({ type: "DELETE_CONTACT_ERROR", err });
