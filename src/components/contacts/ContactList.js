@@ -69,24 +69,10 @@ class ContactList extends Component {
       });
       tempSocket.on("calling", (callingUser, callingSocket) => {
         this.props.updateCallingStatus('beingCalled')
-        if (
-          window.confirm(`Would you like to accept a call from ${callingUser}?`)
-        ) {
-          console.log("Accepting call");
-          this.state.mySocket.emit("accept-call", callingUser, callingSocket);
-        } else {
-          // If the user rejects call
-          this.props.updateCallingStatus('notInCall')
-
-          console.log("Rejecting call");
-          this.state.mySocket.emit(
-            "reject-call",
-            this.props.auth.email,
-            callingSocket
-          );
-          // TODO Destroy recorder!
-        }
+        this.checkAcceptCall(callingUser, callingSocket);
       });
+
+
 
       tempSocket.on("rtc-offer", (callingUser, callingSocket, offerData) => {
         this.props.updateCallingStatus('inCall')
@@ -126,6 +112,24 @@ class ContactList extends Component {
     this.state.mySocket.emit("get-online-users");
 
   };
+
+  checkAcceptCall = (callingUser, callingSocket) => {
+    if (
+      window.confirm(`Would you like to accept a call from ${callingUser}?`)
+    ) {
+      console.log("Accepting call");
+      this.state.mySocket.emit("accept-call", callingUser, callingSocket);
+    } else {
+      // If the user rejects call
+      console.log("Rejecting call");
+      this.state.mySocket.emit(
+        "reject-call",
+        this.props.auth.email,
+        callingSocket
+      );
+      // TODO Destroy recorder!
+    }
+  }
 
   startCall = async receiverName => {
     this.props.updateCallingStatus('calling')

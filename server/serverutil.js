@@ -4,31 +4,40 @@ const { firebase } = require("./firebase");
 const db = firebase.firestore();
 const moment = require("moment");
 
-const initializeConversationData = (initiateTime, caller, receiver) => {
-  let startDateTime = (() => {
-    return new Date();
-  })();
+const initializeConversationData = (initiateTime, pickupDateTime, caller, callingSocket, receiver, receiverSocket) => {
 
-  console.log(startDateTime);
+  console.log(pickupDateTime);
   // Calculate time to pick up to tenth of a second for later processing
   const timeToPickUp =
-    Math.round((startDateTime - initiateTime) / 100) / 10;
-  let id = moment(startDateTime).format("YYYYMMDDHHMM") + shortid.generate();
+    Math.round((pickupDateTime - initiateTime) / 100) / 10;
+  let id = moment(pickupDateTime).format("YYYYMMDDHHMM") + shortid.generate();
   return {
+    // Conversation ID
     newID: id,
+    // Conversation Object
     newConversation: {
       id,
       caller,
       receiver,
       speech: [],
-      startDateTime,
+      startDateTime: pickupDateTime,
       timeToPickUp,
-      bookmarks: []
+      bookmarks: {
+        [callingSocket]: {
+          startTime: initiateTime,
+          bookmarks: []
+        },
+        [receiverSocket]: {
+          startTime: pickupDateTime,
+          bookmarks: []
+        }
+      }
     }
   };
+
 };
 
-const extractConversationData = (speaker, recordStartTime, googleArray) => {
+const extractConversationData = (speaker, transcribeStartTime, googleArray) => {
   let speechArray = [];
   let results = googleArray[0].results;
   if (results === undefined) {
@@ -46,7 +55,7 @@ const extractConversationData = (speaker, recordStartTime, googleArray) => {
     // get text
     let text = result.alternatives[0].transcript;
     // Get and Procees time
-    let time = 0 - recordStartTime;
+    let time = 0 - transcribeStartTime;
     let timeObject = result.alternatives[0].words[0].startTime;
     if (timeObject.seconds !== undefined) {
       time += parseInt(timeObject.seconds);
@@ -97,12 +106,8 @@ const addSpeech = (userName, conversation, newSpeechArray, bookmarks) => {
 const getTranscription = async (audioBytes, socketID) => {
   // Creates a client
   const client = new speech.SpeechClient();
-  console.log(
-    `Sending ${socketID} data (${audioBytes.length} bytes) to Google`
-  );
   const audio = {
     content: audioBytes
-    // data: file,
   };
   const config = {
     encoding: "OGG_OPUS",
@@ -122,7 +127,9 @@ const getTranscription = async (audioBytes, socketID) => {
 
   // ---------------- UNCOMMENT TO WRITE DATA TO FILE
   //fs.writeFileSync(`./server/sample-transcription-${socketID}.json`, JSON.stringify(fullResponse));
-  return JSON.stringify(fullResponse);
+  
+  // Stringify and reparse to remove special Object types etc for further processing
+  return JSON.parse(JSON.stringify(fullResponse));
 };
 
 const addDialogue = data => {
