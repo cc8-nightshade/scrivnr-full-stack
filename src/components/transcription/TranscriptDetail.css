@@ -172,22 +172,23 @@ ul.listWrapper {
 }
 
 @media screen and (max-width: 600px) {
-  .dialogueList {
-    height: 30%;
-    width: 100%;
-    overflow-y: auto;
+   .dialogueList {
+       height: 30%;
+       width: 100%;
+       overflow-y: auto;
+   }
+   .dialogueDetail {
+       height: 60%;
+       width: 100%;
+       overflow-y: auto;
+   }
+   .dialogueWrapper {
+       height: 100%;
+       display: block;
+   }
+   .transcripts {
+     margin: 0;
+     width: 100%;
+   }
   }
-  .dialogueDetail {
-    height: calc(70% - 56px);
-    width: 100%;
-    overflow-y: auto;
-  }
-  .dialogueWrapper {
-    height: 100%;
-    display: block;
-  }
-  .container {
-    margin: 0;
-    width: 100%;
-  }
-}
+
