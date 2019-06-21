@@ -538,7 +538,7 @@ class ContactList extends Component {
                       </i>
                       <i className="secondary-content material-icons buttons"
                         onClick={() => {
-                        this.props.deleteContact(contact.email, auth.uid);
+                        this.props.deleteContact(contact, auth.uid);
                         this.updateState();}}>delete
                       </i>
                     </li>
