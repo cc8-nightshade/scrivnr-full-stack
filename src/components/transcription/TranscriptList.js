@@ -28,7 +28,7 @@ class TranscriptList extends Component {
     const { transcript, transcripts } = this.props;
     console.log(transcripts);
     return (
-      <div className="container">
+      <div className="container transcripts">
         <div className="dialogueWrapper">
           <div className="dialogueList">
             <h2 className="asideHead">Transcript</h2>
