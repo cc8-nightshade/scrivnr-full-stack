@@ -1,5 +1,5 @@
 const intitialState = {
-  status: 'inCall'
+  status: 'notInCall'
 }
 
 
