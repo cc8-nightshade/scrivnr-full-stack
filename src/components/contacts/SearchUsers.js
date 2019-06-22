@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { searchUsers } from "../../store/actions/usersActions";
-import { addToContacts, deleteContact, getContactsByCurrentUser, addContactsToOtherUser } from "../../store/actions/contactsActions"
+import { addToContacts, deleteContact, getContactsByCurrentUser } from "../../store/actions/contactsActions"
 
 export class SearchUsers extends Component {
   constructor(props) {
@@ -45,7 +45,7 @@ export class SearchUsers extends Component {
         { searchedEmail &&
           <ul className="collection">
             <li className="collection-item"  >{searchedEmail[0].firstName} {searchedEmail[0].email}
-            <i onClick={() => {this.props.addToContacts(searchedEmail, auth.uid);this.props.addContactsToOtherUser(searchedEmail, auth.uid); this.updateState()}} className="secondary-content material-icons">person_add</i>
+            <i onClick={() => {this.props.addToContacts(searchedEmail, auth.uid); this.updateState()}} className="secondary-content material-icons">person_add</i>
             </li>
             {/* <div onClick={() => this.props.deleteContact(searchedEmail[0].email, auth.uid)} >Delete</div> */}
           </ul>
@@ -70,7 +70,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = dispatch => ({
   searchUsers: (inputEmail) => dispatch(searchUsers(inputEmail)),
   addToContacts: (searchedEmail, currentUserUid) => dispatch(addToContacts(searchedEmail, currentUserUid)),
-  addContactsToOtherUser: (searchedEmail, currentUserUid) => dispatch(addContactsToOtherUser(searchedEmail, currentUserUid)),
   deleteContact: (searchedEmail, currentUserUid) => dispatch(deleteContact(searchedEmail, currentUserUid)),
   getContactsByCurrentUser: () => dispatch(getContactsByCurrentUser()),
 
