@@ -1,87 +1,131 @@
-
 export const getContactsByCurrentUser = () => {
   return (dispatch, getState, { getFirestore }) => {
-    const firestore = getFirestore()
-    const userID = getState().firebase.auth.uid // later for mapping userid to contacts
+    const firestore = getFirestore();
+    const userID = getState().firebase.auth.uid; // later for mapping userid to contacts
     // onSnapshot - try to implement for auto-updating
-    firestore.collection('users').where('uid', '==', userID).get().then(querySnapshot => {
-      let userInfo = []
-      querySnapshot.forEach(doc => {
-        userInfo.push(doc.data())
+    firestore
+      .collection("users")
+      .where("uid", "==", userID)
+      .get()
+      .then(querySnapshot => {
+        let userInfo = [];
+        querySnapshot.forEach(doc => {
+          userInfo.push(doc.data());
+        });
+        const contactArray = userInfo[0].contacts;
+        dispatch({ type: "GET_CONTACTS", contactArray });
+      })
+      .catch(err => {
+        dispatch({ type: "GET_CONTACTS_ERROR", err });
       });
-      const contactArray = userInfo[0].contacts;
-      dispatch({ type: "GET_CONTACTS", contactArray }
-      );
-    })
-    .catch((err) => {
-      dispatch({ type: "GET_CONTACTS_ERROR", err})
-    })
-
   };
 };
 
 export const addToContacts = (searchedEmail, currentUserUid) => {
   return (dispatch, getState, { getFirestore }) => {
-    const firestore = getFirestore()
-    const userID = getState().firebase.auth.uid // later for mapping userid to contacts
+    const firestore = getFirestore();
+    const userID = getState().firebase.auth.uid; // later for mapping userid to contacts
     // onSnapshot - try to implement for auto-updating
-    console.log(userID)
-    firestore.collection('users').where('uid', '==', userID).get().then(querySnapshot => {
-      let userInfo = []
-      querySnapshot.forEach(doc => {
-        console.log(doc.data())
-        userInfo.push(doc.data())
+    Promise.all([
+      firestore
+        .collection("users")
+        .where("uid", "==", userID)
+        .get(),
+      firestore
+        .collection("users")
+        .where("uid", "==", searchedEmail[0].uid)
+        .get()
+    ]).then(profiles => {
+      const profilesArray = [];
+      profiles.forEach(profile => {
+        profile.forEach(querySnapshot => {
+          profilesArray.push(querySnapshot.data());
+        });
       });
-      const contactArray = userInfo[0].contacts;
-      console.log('add action called', contactArray)
-      return contactArray
+      const hasContact = profilesArray[1].contacts.filter(contact => {
+        return contact.uid === profilesArray[0].uid;
+      });
+      const hasContactTwo = profilesArray[0].contacts.filter(contact => {
+        return contact.uid === profilesArray[1].uid;
+      });
+
+      if (hasContact.length === 0) {
+        let newContactData = { ...profilesArray[0] };
+        delete newContactData["contacts"];
+        profilesArray[1].contacts.push(newContactData);
+      }
+      if (hasContactTwo.length === 0) {
+        let newContactData = { ...profilesArray[1] };
+        delete newContactData["contacts"];
+        profilesArray[0].contacts.push(newContactData);
+      }
+
+      // console.log(profilesArray);
+
+      profilesArray.forEach(profile => {
+        firestore
+          .collection("users")
+          .doc(profile.uid)
+          .update({
+            contacts: profile.contacts
+          });
+      });
     })
-    .then((contactArray) => {
-      contactArray.push(searchedEmail[0])
-      firestore.collection('users').doc(currentUserUid).update({
-      contacts: contactArray
-      })
-    })
-    .then(() => 
+    .then(() =>
     {
       dispatch({ type: "ADD_CONTACT" }
       );
     }).catch((err) => {
       dispatch({ type: "ADD_CONTACT_ERROR", err})
     })
-
   };
 };
 
-export const deleteContact = (searchedEmail, currentUserUid) => {
+export const deleteContact = (searchedProfile, currentUserUid) => {
   return (dispatch, getState, { getFirestore }) => {
-    const firestore = getFirestore()
-    const userID = getState().firebase.auth.uid // later for mapping userid to contacts
-    // onSnapshot - try to implement for auto-updating
-    firestore.collection('users').where('uid', '==', userID).get().then(querySnapshot => {
-      let userInfo = []
-      querySnapshot.forEach(doc => {
-        userInfo.push(doc.data())
-      });
-      const contactArray = userInfo[0].contacts;
-      return contactArray
-    })
-    .then((contactArray) => {
-      const filteredArray = contactArray.filter(contact => contact.email !== searchedEmail)
-      firestore.collection('users').doc(currentUserUid).update({
-      contacts: filteredArray
+    const firestore = getFirestore();
+    const userID = getState().firebase.auth.uid; // later for mapping userid to contacts
+    console.log(userID, searchedProfile);
+    Promise.all([
+      firestore
+        .collection("users")
+        .where("uid", "==", userID)
+        .get(),
+      firestore
+        .collection("users")
+        .where("uid", "==", searchedProfile.uid)
+        .get()
+    ])
+    .then(profiles => {
+      const profilesArray = [];
+      profiles.forEach(profile => {
+        profile.forEach(querySnapshot => {
+          const data = querySnapshot.data();
+          profilesArray.push(data);
+        });
       })
-      // return filteredArray
-      console.log('delete dispatch called', filteredArray)
-      dispatch({ type: "DELETE_CONTACT", filteredArray }
-      );
-    })
-    // .then((filteredArray) => 
-    // {
-    // })
-    .catch((err) => {
-      dispatch({ type: "DELETE_CONTACT_ERROR", err})
-    })
 
+      
+        const currentFilteredContacts = profilesArray[0].contacts.filter(item => {return item.uid !== searchedProfile.uid})
+        firestore
+          .collection("users")
+          .doc(userID)
+          .update({
+            contacts: currentFilteredContacts
+          })
+      
+        const otherUserFilteredContacts = profilesArray[1].contacts.filter(item => {return item.uid !== userID})
+        firestore
+          .collection("users")
+          .doc(searchedProfile.uid)
+          .update({
+            contacts: otherUserFilteredContacts
+          })
+        
+        dispatch({ type: "DELETE_CONTACT", currentFilteredContacts });
+    })
+    .catch(err => {
+      dispatch({ type: "DELETE_CONTACT_ERROR", err });
+    });
   };
 };
