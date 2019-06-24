@@ -63,6 +63,10 @@ class ContactList extends Component {
     // Initialize Socket Details
     {
       tempSocket.on("message", messageData => {
+        // If a bad message, puts state back into notInCall
+        if (messageData.indexOf("Sorry") > -1){
+          this.props.updateCallingStatus('notInCall');
+        }
         alert(messageData);
       });
       tempSocket.on("online-users", onlineNow => {
@@ -77,6 +81,7 @@ class ContactList extends Component {
 
 
       tempSocket.on("rtc-offer", (callingUser, callingSocket, offerData) => {
+        console.log('Changing to inCall');
         this.props.updateCallingStatus('inCall')
         console.log("receiving offer", offerData);
         if (this.state.myPeerConnection === undefined) {
@@ -90,6 +95,7 @@ class ContactList extends Component {
         this.endCall();
       });
       tempSocket.on("rtc-answer", answerData => {
+        console.log('Changing to inCall');
         this.props.updateCallingStatus('inCall')
         this.handleAnswerMessage(answerData);
       });

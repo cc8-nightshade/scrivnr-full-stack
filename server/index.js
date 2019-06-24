@@ -62,13 +62,16 @@ io.on("connection", (socket) => {
     // Clear data if remaining
     if (bufferData[socket.id]) {
       delete bufferData[socket.id];
+      console.log("cleared disconnecting user's old buffers")
     }
     if (offers[socket.id]) {
       delete offers[socket.id];
+      console.log("cleared disconnecting user's old offers")
     }
     // Clear from connected users
     if (connectedUsers[socket.id]) {
       delete connectedUsers[socket.id];
+      console.log("cleared disconnecting user's old connection data")
     }
     // Update other online users with 
     io.emit("online-users", 
@@ -104,43 +107,53 @@ io.on("connection", (socket) => {
   });
 
   socket.on("rtc-offer", (callingUser, receivingUser, offer) => {  
-    console.log(`Received offer from ${callingUser} >>> ${receivingUser}`);
-    // find receiving user's socket
-    let receivingSocket = '';
-    for (let user in connectedUsers) {
-      if (connectedUsers[user]['userName'] === receivingUser) {
-        receivingSocket = user;
-        break;
+    // Handle rare case where user's connection was persistent but server rebooted.
+    if (connectedUsers[socket.id] === undefined) {
+      io.to(socket.id).emit("message", "Please refresh page to reconnect to server.");
+    } else {
+      console.log(`Received offer from ${callingUser} >>> ${receivingUser}`);
+      // find receiving user's socket
+      let receivingSocket = '';
+      for (let user in connectedUsers) {
+        if (connectedUsers[user]['userName'] === receivingUser) {
+          receivingSocket = user;
+          break;
+        }
       }
-    }
-    //NEW METHOD OF HOLDING OFFER
-    if (receivingSocket !== '' && io.sockets.connected[receivingSocket] !== undefined) {
-      offers[socket.id] = {
-        initiateTime: new Date(),
-        offer,
-        candidates: []
-      };
-      console.log(`Stored call from ${callingUser} to ${receivingUser} (${receivingSocket})`);
-      io.to(receivingSocket).emit("calling", callingUser, socket.id);
-    } else { // REJECT IF CAN'T FIND USER/SOCKET
-      io.to(socket.id).emit("reject-call", receivingUser);
+      //NEW METHOD OF HOLDING OFFER
+      if (receivingSocket !== '' && io.sockets.connected[receivingSocket] !== undefined) {
+        offers[socket.id] = {
+          initiateTime: new Date(),
+          offer,
+          candidates: []
+        };
+        console.log(`Stored call from ${callingUser} to ${receivingUser} (${receivingSocket})`);
+        io.to(receivingSocket).emit("calling", callingUser, socket.id);
+      } else { // REJECT IF CAN'T FIND USER/SOCKET
+        io.to(socket.id).emit("reject-call", receivingUser);
+      }
     }
   });
 
   socket.on("accept-call", (callingUser, callingSocket) => {
     console.log(`call from ${callingUser} accepted by ${socket.id}`);
-    // send offer to accepting user
-    io.to(socket.id).emit(
-      "rtc-offer", 
-      callingUser, 
-      callingSocket, 
-      offers[callingSocket]['offer']
-    );
-    // sending candidates saved up on the server
-    if (offers[callingSocket]['candidates'].length > 0) {
-      for (let candidate of offers[callingSocket]['candidates']) {
-        io.to(socket.id).emit("new-ice-candidate", candidate);
+    if(offers[callingSocket] !== undefined) {
+      // send offer to accepting user
+      io.to(socket.id).emit(
+        "rtc-offer", 
+        callingUser, 
+        callingSocket, 
+        offers[callingSocket]['offer']
+      );
+      // sending candidates saved up on the server
+      if (offers[callingSocket]['candidates'].length > 0) {
+        for (let candidate of offers[callingSocket]['candidates']) {
+          io.to(socket.id).emit("new-ice-candidate", candidate);
+        }
       }
+    } else {
+      io.to(socket.id).emit("message", "Sorry, but the calling user has cancelled/disconnected.");
+      console.log(`Accept ignored from ${socket.id} due to no corresponding data.`)
     }
 
   });
@@ -152,9 +165,13 @@ io.on("connection", (socket) => {
       io.to(callingSocket).emit("reject-call", receiverName);
       // Clear offer data
       delete offers[callingSocket];
+      console.log(`Deleted offer data for rejected call from ${callingSocket}`)
       setTimeout(() => {
         delete bufferData[callingSocket];
+        console.log(`Deleted buffer data for ${callingSocket}`)
       }, 3000);
+    } else {
+      console.log(`Reject ignored from ${receiverName} due to no corresponding data.`)
     }
   }); 
 
@@ -192,15 +209,18 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-ice-candidate", (candidate) => {
-    // store candidate if there is an unanswered call
-    if (offers[socket.id] !== undefined) {
-      offers[socket.id]['candidates'].push(candidate);
-      console.log(`holding ice candidate from ${socket.id}, total candidates: ${offers[socket.id]['candidates'].length}`)
-    } 
-    else {
-      console.log("transmitting ice candidate from", socket.id);
-      let targetUser = connectedUsers[socket.id]["partnerSocket"];
-      io.to(targetUser).emit("new-ice-candidate", candidate);
+    // First, check to see if user calling is registered
+    if (connectedUsers[socket.id] !== undefined) {
+      // store candidate if there is an unanswered call
+      if (offers[socket.id] !== undefined) {
+        offers[socket.id]['candidates'].push(candidate);
+        console.log(`holding ice candidate from ${socket.id}, total candidates: ${offers[socket.id]['candidates'].length}`)
+      } 
+      else {
+        console.log("transmitting ice candidate from", socket.id);
+        let targetUser = connectedUsers[socket.id]["partnerSocket"];
+        io.to(targetUser).emit("new-ice-candidate", candidate);
+      }
     }
   });
 
@@ -222,11 +242,13 @@ io.on("connection", (socket) => {
       let targetSocket = connectedUsers[socket.id]["partnerSocket"];
       io.to(targetSocket).emit("hang-up");
     } else if (offers[socket.id] !== null) {
+      // This section is performed when call is cancelled by caller.
       console.log(`connection ${socket.id} is cancelling. Removing data..`);
       delete offers[socket.id];
-      if(bufferData[callingSocket] !== null) {
+      if(bufferData[socket.id] !== null) {
         setTimeout(() => {
-          delete bufferData[callingSocket];
+          delete bufferData[socket.id];
+          console.log(`Deleted buffer data for ${socket.id}`);
         }, 3000);
       }
     }
