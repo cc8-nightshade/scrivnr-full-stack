@@ -248,6 +248,7 @@ io.on("connection", (socket) => {
     // If conversation has yet to be moved to processing, move it
     if (conversations[conversationID] !== undefined) {
       processing[conversationID] = JSON.parse(JSON.stringify(conversations[conversationID]));
+      processing[conversationID]['startDateTime'] = new Date(processing[conversationID]['startDateTime']);
       delete conversations[conversationID];
       console.log(`moved conversation ${conversationID} from current data, leaving ${Object.keys(conversations)}`);
     }
