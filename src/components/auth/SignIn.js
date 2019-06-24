@@ -27,7 +27,7 @@ class SignIn extends Component {
     if(auth.uid) return <Redirect to='/contacts'></Redirect>
     return (      
 
-      <div className="container">
+      <div className="container signWrapper">
         <div className="our-logo">
           <img className="logo-img" src={logo} alt=""/>
         </div>

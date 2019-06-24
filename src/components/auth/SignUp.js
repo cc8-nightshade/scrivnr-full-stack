@@ -27,7 +27,7 @@ class SignUp extends Component {
     if(auth.uid) return <Redirect to='/'></Redirect>
 
     return (
-      <div className="container">
+      <div className="container signWrapper">
         <form onSubmit={this.handleSubmit} className="white">
           <h5 className="grey-text text-darken-3">Sign up</h5>
           <div className="input-field">
