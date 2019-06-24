@@ -146,14 +146,16 @@ io.on("connection", (socket) => {
   });
     
   socket.on("reject-call", (receiverName, callingSocket) => {
-    console.log(`Transferring REJECT message from --${receiverName}-- to --${connectedUsers[callingSocket]["userName"]}--`);
-    // Tell calling user
-    io.to(callingSocket).emit("reject-call", receiverName);
-    // Clear offer data
-    delete offers[callingSocket];
-    setTimeout(() => {
-      delete bufferData[callingSocket];
-    }, 3000);
+    console.log(`Got REJECT message from --${receiverName}-- to --${connectedUsers[callingSocket]["userName"]}--`);
+    if (offers[callingSocket] !== undefined) {
+      // Tell calling user
+      io.to(callingSocket).emit("reject-call", receiverName);
+      // Clear offer data
+      delete offers[callingSocket];
+      setTimeout(() => {
+        delete bufferData[callingSocket];
+      }, 3000);
+    }
   }); 
 
   socket.on("rtc-answer", (callingSocket, answer) => {
@@ -219,6 +221,14 @@ io.on("connection", (socket) => {
       // Forward Hang-up to partnerSocket
       let targetSocket = connectedUsers[socket.id]["partnerSocket"];
       io.to(targetSocket).emit("hang-up");
+    } else if (offers[socket.id] !== null) {
+      console.log(`connection ${socket.id} is cancelling. Removing data..`);
+      delete offers[socket.id];
+      if(bufferData[callingSocket] !== null) {
+        setTimeout(() => {
+          delete bufferData[callingSocket];
+        }, 3000);
+      }
     }
   });
   
