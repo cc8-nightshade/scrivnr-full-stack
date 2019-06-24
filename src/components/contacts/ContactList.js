@@ -548,7 +548,7 @@ class ContactList extends Component {
                     return (
                     <li key={index} className="collection-item">
                       {contact.firstName} {contact.lastName}
-                      <i className="secondary-content material-icons buttons">
+                      <i className="secondary-content material-icons buttons absent">
                         not_interested
                       </i>
                       <i className="secondary-content material-icons buttons"

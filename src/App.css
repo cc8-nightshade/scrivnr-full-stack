@@ -89,6 +89,9 @@ button {
 .button {
   cursor: pointer;
 }
+.absent {
+  visibility: hidden;
+}
 video {
   margin: 0;
   padding: 0;

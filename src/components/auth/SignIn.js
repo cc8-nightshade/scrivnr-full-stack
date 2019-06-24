@@ -34,7 +34,7 @@ class SignIn extends Component {
         <div className="writing">
           <h5>Scrivnr is a voice call and transcribing app.</h5>
           <h6>
-          Call a contact and soon after you will receive a transcription of the conversation
+          Call a contact and soon after you will receive a transcription of the conversation.
           </h6>
           <h6>You can also add bookmarks with a quick tap during the call!</h6>
         </div>
