@@ -85,7 +85,10 @@ export const deleteContact = (searchedProfile, currentUserUid) => {
   return (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const userID = getState().firebase.auth.uid; // later for mapping userid to contacts
-    console.log(userID, searchedProfile);
+    
+    const confirmation = window.confirm(`Are you sure you want to delete ${searchedProfile.email}`)
+    if(!confirmation){return false};
+
     Promise.all([
       firestore
         .collection("users")
