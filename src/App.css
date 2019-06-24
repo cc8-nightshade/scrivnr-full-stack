@@ -6,14 +6,11 @@
 .brand-logo {
   margin-left: 30px;
 }
-
 /* NAVBAR */
 .signedin {
   margin-right: 20px;
 }
-
 /* SIGN-IN */
-
 .our-logo {
   text-align: center;
   margin: 50px;
@@ -26,21 +23,17 @@
   text-align: center;
   margin: 10px;
 }
-
 /* CONTACTS */
 .contact-video {
   display: flex;
 }
-
 img {
   height: 100px;
   width: 100px;
 }
-
 i {
   cursor: pointer;
 }
-
 .user-header {
   margin-top: -20px;
   margin-bottom: 20px;
@@ -49,11 +42,9 @@ i {
   margin-top: 50px;
   width: 50%;
 }
-
 .secondary-content {
   padding-left: 20px;
 }
-
 .button-call-wrapper {
   text-align: center;
   width: 50%;
@@ -63,19 +54,16 @@ i {
   justify-content: space-around;
   flex-direction: column; */
 }
-
 .button-video-items {
   position: relative;
   top: 50%;
   transform: translateY(-50%);
   padding-bottom: 250px;
 }
-
 .hangup {
   width: 125px;
   height: 50px;
 }
-
 .camera-box {
   width: 1px;
   height: 1px;
@@ -89,34 +77,26 @@ i {
 #hangup-button {
   display: inline-block;
 }
-
 button {
   cursor: pointer;
   margin: 10px;
 }
-
 .button {
   cursor: pointer;
 }
-
 video {
   margin: 0;
   padding: 0;
 }
-
-
-
 @media screen and (max-width: 992px) {
   .brand-logo {
     margin-left: 30px;
   }
 }
-
 @media screen and (max-width: 1228px) {
   .brand-logo {
     margin-left: 30px;
   }
-
 }
 @media screen and (max-width: 826px) {
   .contact-video {
@@ -127,15 +107,19 @@ video {
     margin-left: 30px;
   }
 }
-
 @media screen and (max-width: 768px) {
   .contact-video {
     overflow-y: auto;
     height: calc(100% - 56px) !important;
     padding-bottom: 50px;
   }
+  .contact-list {
+    order: 2;
+  }
   .button-call-wrapper{
     width: 100%;
+    margin-top: 30px;
+    order: 1;
   }
   .button-video-items {
     position: relative;
@@ -159,4 +143,3 @@ video {
     cursor: pointer;
   }
 }
-
