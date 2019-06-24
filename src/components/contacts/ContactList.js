@@ -423,14 +423,12 @@ class ContactList extends Component {
     let buttons;
     if (status == "notInCall") {
       buttons = (
-        <div className="button-video-items">
+        <div className="button-video-items logo-writing">
           <div className="our-logo">
             <img className="logo-img" src={logo} alt=""/>
           </div>
           <div className="writing">
             <h5>Search for contact by email, tap add - then call!</h5>
-            {/* <h5>Tap the add button</h5>
-            <h5>Then use the call button</h5> */}
           </div>
         </div> 
       )
