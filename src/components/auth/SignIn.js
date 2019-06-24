@@ -32,8 +32,11 @@ class SignIn extends Component {
           <img className="logo-img" src={logo} alt=""/>
         </div>
         <div className="writing">
-          <h5>Scrivnr is a voice call and transcribing app - simply search for a contact by email, add them, then call them. Soon after you will receive a transcription of the conversation.</h5>
-          <h6>You can also add bookmarks with a quick tap during the call to highlight points you may want to come back to!</h6>
+          <h5>Scrivnr is a voice call and transcribing app.</h5>
+          <h6>
+          Call a contact and soon after you will receive a transcription of the conversation
+          </h6>
+          <h6>You can also add bookmarks with a quick tap during the call!</h6>
         </div>
         <form onSubmit={this.handleSubmit} className="white">
           <h5 className="grey-text text-darken-3">Log in</h5>
