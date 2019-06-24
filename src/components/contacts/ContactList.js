@@ -425,7 +425,7 @@ class ContactList extends Component {
     let buttons;
     if (status == "notInCall") {
       buttons = (
-        <div className="button-video-items logo-writing">
+        <div className="button-video-items">
           <div className="our-logo">
             <img className="logo-img" src={logo} alt=""/>
           </div>
@@ -439,6 +439,8 @@ class ContactList extends Component {
         <div>
           <div className="button-video-items">
             <img src={phone} alt="phone"/>
+          </div>
+          <div className="button-wrapper">
             <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
               Cancel
             </button>
