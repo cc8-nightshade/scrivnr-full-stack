@@ -436,8 +436,8 @@ class ContactList extends Component {
       )
     } else if( status == 'calling'){
       buttons = (
-        <div>
-          <div className="button-video-items">
+        <div className="button-video-items">
+          <div className="image-wrapper">
             <img src={phone} alt="phone"/>
           </div>
           <div className="button-wrapper">
