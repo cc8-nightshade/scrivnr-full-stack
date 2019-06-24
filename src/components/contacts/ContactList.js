@@ -129,6 +129,8 @@ class ContactList extends Component {
         this.props.auth.email,
         callingSocket
       );
+      this.props.updateCallingStatus('notInCall')
+
       // TODO Destroy recorder!
     }
   }
