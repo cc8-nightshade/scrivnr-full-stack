@@ -108,6 +108,10 @@ video {
   }
 }
 @media screen and (max-width: 768px) {
+  .signWrapper {
+    overflow-y: auto;
+  }
+
   .contact-video {
     overflow-y: auto;
     height: calc(100% - 56px) !important;
