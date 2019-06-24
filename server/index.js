@@ -249,6 +249,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("end-recording", async () => {
+    // telling user their transcription is being processed
+    io.to(socket.id).emit("message", "You're transcription is being processed.\nThis could take several minutes for longer conversations.\nYou will get another alert when processing is done.");
+    
     // Extract important properties for reference, then clear from connectedUsers (Allows for next conversation)
     let conversationID = connectedUsers[socket.id]['conversationID'];
     let partnerSocket = connectedUsers[socket.id]['partnerSocket'];
