@@ -437,10 +437,10 @@ class ContactList extends Component {
         <div>
           <div className="button-video-items">
             <img src={phone} alt="phone"/>
+            <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
+              Cancel
+            </button>
           </div>
-          <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
-            Cancel
-          </button>
         </div>
       )
     } else if( status == 'calling-receiving'){
@@ -458,9 +458,6 @@ class ContactList extends Component {
             <img src={phone} alt="phone"/>
           </div>
           <div className="button-wrapper">
-            <button id="answer-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
-              Answer
-            </button>
             <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
               Hang Up
             </button>
