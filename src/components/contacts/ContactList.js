@@ -328,8 +328,10 @@ class ContactList extends Component {
     if (this.state.mediaRecorder) {
       this.state.mediaRecorder.stop();
 
+      
+    }
+    if(this.state.myPeerConnection.remoteDescription !== null){
       setTimeout(() => {this.state.mySocket.emit("end-recording");}, 2000);
-
     }
     this.resetMyPeerConnection();
     this.setState({
@@ -423,13 +425,18 @@ class ContactList extends Component {
       )
     } else if( status == 'calling'){
       buttons = (
-        <div className="">
-          <img src={phone} alt="phone"/>
+        <div>
+          <div className="button-video-items">
+            <img src={phone} alt="phone"/>
+          </div>
+          <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={this.hangUpCall}>
+            Cancel
+          </button>
         </div>
       )
     } else if( status == 'calling-receiving'){
       buttons = (
-        <div className="">
+        <div className="button-video-items">
           <img src={phone} alt="phone"/>
         </div>
       )
@@ -437,7 +444,7 @@ class ContactList extends Component {
     } else if( status == "beingCalled") {
       buttons = (
         // BUTTONS START
-        <div className="">
+        <div className="button-video-items">
           <div className="image-wrapper">
             <img src={phone} alt="phone"/>
           </div>
