@@ -16,6 +16,8 @@ import io from "socket.io-client";
 import Recorder from "opus-recorder";
 import { exportDefaultSpecifier } from "@babel/types";
 import phone from '../../images/phone.gif'
+import logo from '../../images/our-logo.png'
+
 
 class ContactList extends Component {
   constructor(props) {
@@ -421,7 +423,16 @@ class ContactList extends Component {
     let buttons;
     if (status == "notInCall") {
       buttons = (
-        <div className=""></div> 
+        <div className="button-video-items">
+          <div className="our-logo">
+            <img className="logo-img" src={logo} alt=""/>
+          </div>
+          <div className="writing">
+            <h5>Search for contact by email, tap add - then call!</h5>
+            {/* <h5>Tap the add button</h5>
+            <h5>Then use the call button</h5> */}
+          </div>
+        </div> 
       )
     } else if( status == 'calling'){
       buttons = (

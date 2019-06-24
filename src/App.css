@@ -60,6 +60,11 @@ i {
   transform: translateY(-50%);
   padding-bottom: 250px;
 }
+
+.writing {
+  margin-top: -30px;
+  padding: 0 50px;
+}
 .hangup {
   width: 125px;
   height: 50px;
