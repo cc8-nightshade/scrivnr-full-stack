@@ -419,17 +419,17 @@ class ContactList extends Component {
     let buttons;
     if (status == "notInCall") {
       buttons = (
-        <div className="video-hangup-wrapper"></div> 
+        <div className=""></div> 
       )
     } else if( status == 'calling'){
       buttons = (
-        <div className="video-hangup-wrapper">
+        <div className="">
           <img src={phone} alt="phone"/>
         </div>
       )
     } else if( status == 'calling-receiving'){
       buttons = (
-        <div className="video-hangup-wrapper">
+        <div className="">
           <img src={phone} alt="phone"/>
         </div>
       )
@@ -437,7 +437,7 @@ class ContactList extends Component {
     } else if( status == "beingCalled") {
       buttons = (
         // BUTTONS START
-        <div className="video-hangup-wrapper ">
+        <div className="">
           <div className="image-wrapper">
             <img src={phone} alt="phone"/>
           </div>
@@ -462,7 +462,7 @@ class ContactList extends Component {
     } else if( status == "inCall") {
       buttons = (
         // BUTTONS START
-        <div className="video-hangup-wrapper ">
+        <div className="button-video-items">
           <div className="camera-box">
             <video id="received_video" autoPlay />
             <video id="local_video" autoPlay muted />
@@ -477,7 +477,6 @@ class ContactList extends Component {
             <button id="hangup-button" className="btn buttons hangup waves-effect waves-light" onClick={() => this.bookmarkBtn(this.props.auth.email)}>
               Bookmark
             </button>
-
           </div>
         </div>
       // BUTTONS END 
@@ -486,7 +485,7 @@ class ContactList extends Component {
 
 
     return (
-      <div className="contact-video wrapper container">
+      <div className="contact-video container">
          
         {/* CONTACTS START */}
         <div className="contact-list">
@@ -549,7 +548,9 @@ class ContactList extends Component {
           </div>
         </div>
         {/* CONTACTS ENDS */}
-        { buttons }
+        <div className="button-call-wrapper">
+          { buttons }
+        </div>
 
       </div>
     );

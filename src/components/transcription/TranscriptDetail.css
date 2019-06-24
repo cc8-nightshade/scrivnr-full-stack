@@ -172,11 +172,11 @@ ul.listWrapper {
 }
 
 @media screen and (max-width: 600px) {
-  .dialogueList {
-    height: 30%;
-    width: 100%;
-    overflow-y: auto;
-  }
+   .dialogueList {
+       height: 30%;
+       width: 100%;
+       overflow-y: auto;
+   }
   .dialogueDetail {
     height: calc(70% - 56px);
     width: 100%;
@@ -191,3 +191,4 @@ ul.listWrapper {
     width: 100%;
   }
 }
+

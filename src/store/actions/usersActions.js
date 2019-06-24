@@ -33,7 +33,6 @@ export const searchUsers = (input) => {
       let searchedEmail = []
       // not working // 
       querySnapshot.forEach(doc => {
-        console.log(doc.id)
         searchedEmail.push(doc.data())
       });
       dispatch({ type: "SEARCH_USERS", searchedEmail }
