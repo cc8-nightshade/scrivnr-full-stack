@@ -33,7 +33,7 @@ class TranscriptList extends Component {
           <div className="dialogueList">
             <h2 className="asideHead">Transcript</h2>
             <ul className="listWrapper">
-              {transcripts &&
+              {transcripts.length > 0 &&
                 transcripts.map((item, index) => (
                   <li
                     key={item.id}
@@ -42,7 +42,7 @@ class TranscriptList extends Component {
                       this.selectItem(index);
                     }}
                   >
-                    {moment(item.startDate.toDate()).format("YYYY/MM/DD HH:mm")} <br />
+                    {moment(item.startDate).format("YYYY/MM/DD HH:mm")} <br />
                     {this.props.auth.email === item.caller ? item.receiver : item.caller}
                   </li>
                 ))}
@@ -65,7 +65,7 @@ class TranscriptList extends Component {
                       );
                     } else if (item.bookmark && this.props.auth.email !== item.speaker){}
                     else {
-                      const time = new Date(transcript.startDate.toDate());
+                      const time = new Date(transcript.startDate);
                       time.setSeconds(time.getSeconds() + item.time);
                       return (
                         <li
