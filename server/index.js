@@ -272,7 +272,7 @@ io.on("connection", (socket) => {
 
   socket.on("end-recording", async () => {
     // telling user their transcription is being processed
-    io.to(socket.id).emit("message", "You're transcription is being processed.\nThis could take several minutes for longer conversations.\nYou will get another alert when processing is done.");
+    io.to(socket.id).emit("message", "Your transcription is being processed.\nThis could take several minutes for longer conversations.\nYou will get another alert when processing is done.");
     
     // Extract important properties for reference, then clear from connectedUsers (Allows for next conversation)
     let conversationID = connectedUsers[socket.id]['conversationID'];
@@ -330,7 +330,7 @@ io.on("connection", (socket) => {
 
         // Inform users
         console.log(`informing ${socket.id}`)
-        io.to(socket.id).emit("message", "You're transcription is finished.");
+        io.to(socket.id).emit("message", "Your transcription is finished.");
         console.log(`informing ${partnerSocket}`)
         io.to(partnerSocket).emit("message", "You're transcription is finished.");
       }
