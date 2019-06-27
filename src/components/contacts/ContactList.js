@@ -475,10 +475,10 @@ class ContactList extends Component {
               Bookmark
             </button>
           </div>
-          <div className="camera-box">
+          {/* <div className="camera-box">
             <video id="received_video" autoPlay />
             <video id="local_video" autoPlay muted />
-          </div>
+          </div> */}
         </div>
       // BUTTONS END 
       )
@@ -486,10 +486,10 @@ class ContactList extends Component {
       buttons = (
         // BUTTONS START
         <div className="button-video-items">
-          <div className="camera-box">
+          {/* <div className="camera-box">
             <video id="received_video" autoPlay />
             <video id="local_video" autoPlay muted />
-          </div>
+          </div> */}
           <div className="image-wrapper">
             <img src={phone} alt="phone"/>
           </div>
@@ -568,6 +568,10 @@ class ContactList extends Component {
                   }
                 })}
             </ul>
+          </div>
+          <div className="camera-box">
+            <video id="received_video" autoPlay />
+            <video id="local_video" autoPlay muted />
           </div>
         </div>
         {/* CONTACTS ENDS */}
