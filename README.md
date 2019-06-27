@@ -6,10 +6,8 @@ saves a transcription (created using Google Speech-to-text) of the conversation 
 This repository contains both front-end (ReactJS app) and back-end (Express server) code.
 
 ## Getting Started
+
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-
-
 
 ### Prerequisites
 
@@ -28,7 +26,8 @@ A step by step series of examples that tell you how to get a development env run
 - Set up Firebase instance with Tables as follows
  - Users & Authentication
  - Empty "contacts" array for each user
-- Set up your own Firebase credentials in src/config/fbConfig.js
+- Set up your Firebase credentials.
+  - Front-end: src/config/fbConfig.js
 ```
   apiKey:'xxx',
   authDomain: "yyy.firebaseapp.com",
@@ -38,14 +37,30 @@ A step by step series of examples that tell you how to get a development env run
   messagingSenderId: "12345",
   appId: "1:1234567:web:abc123"
 ```
+  - Back-end: environment variables (referenced in /server/firebase.js)
+```
+process.env.API_KEY,
+process.env.AUTO_DOMAIN,
+process.env.DATABASE_URL,
+process.env.PROJECT_ID,
+process.env.STORAGE_BUCKET,
+process.env.MESSAGING_SENDER_ID,
+process.env.API_ID
+```
 - If you don't have one, create an account with Google Cloud Platform (GCP), download your JSON file credentials and set them up on your machine. For directions, please check the GCP site. (Note: Call functionality will still work without GCP)
 - Build react app production build (Note: Please use yarn to manage dependencies.)
 ```
 yarn build
 ``` 
+- Prepare HTTPS keys
+  - If you want to run the server locally and make calls between different machines, it needs to be an HTTPS connection (browsers won't let you share your mic otherwise). Private key and certificates are read by server/index.js when starting the HTTPS version of the server. You can use Open SSL etc for this. Create the following two files in your repository for HTTPS.
+```
+server/ssl/server.key
+server/ssl/server.cert
+```
 - Start the server
 ```
-yarn start
+yarn start // if there is no "ISHEROKU" environment variable, will start an HTTPS server so you can serve to 
 ``` 
 - Access the site
 ```
@@ -62,44 +77,26 @@ const tempSocket = io.connect("<YOUR_SOCKET_SERVER>");
 ```
 - Sign up and create a few users, then use Contact List functionality to add.
 
-
-## Running the tests
-
-Currently there are no automated tests created for Scrivnr. Please check out our CONTRIBUTE.md and help out!
-
-### End to end tests
-
-Calling and transcription features were tested by hand
-
-### And coding style tests
-
-Currently, no coding style tests exist
-
 ## Deployment
 
-Scrivnr has been successfully deployed to heroku at https://scrivnr-react.herokuapp.com/
-The following things are required for successful 
+Scrivnr has been successfully deployed to heroku at https://cc-scrivnr.herokuapp.com/
+The following things are required for successful operation. Also, you need to find a way  
 
 Environment variables
 ```
-ISHEROKU=yes // This will con
-
+ISHEROKU=yes // This will make the server load as HTTP (not HTTPS), but Heroku then sets it up as HTTPS for you.
+API_KEY=xxx //Firebase credentials
+...
 ```
 
 ## Built With
 
-* [React](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [yarn](https://maven.apache.org/) - Dependency Management
-* [AAA](https://AAA.com/) - Used to generate RSS Feeds
+* [React](https://reactjs.org) - The web framework used
+* [yarn](https://yarnpkg.com/) - Dependency Management
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+Please raise issues in the repository and tag one of the original authors.
 
 ## Creators
 
@@ -114,38 +111,3 @@ This project is licensed under the MIT License.
 ## Acknowledgments, other
 
 * This is a senior project created over 3 weeks at the Code Chrysalis Immersive Course.
-* Inspiration
-* etc
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `yarn start`
-
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-## Other
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
