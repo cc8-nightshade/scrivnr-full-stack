@@ -25,7 +25,7 @@ A step by step series of examples that tell you how to get a development env run
 
 - Set up Firebase instance with Tables as follows
  - Users & Authentication
- - Empty "contacts" array for each user
+ - "dialogues" and "users" collections in your Firestore database
 - Set up your Firebase credentials.
   - Front-end: src/config/fbConfig.js
 ```
@@ -88,11 +88,6 @@ ISHEROKU=yes // This will make the server load as HTTP (not HTTPS), but Heroku t
 API_KEY=xxx //Firebase credentials
 ...
 ```
-Database
-
-Set up a Firebase account that allows authentification to sign-up users
-Create a Firestore database with a 'dialogues' and 'users' collection
-Put your Firebase/Firestore config into src/config file
 
 ## Built With
 
