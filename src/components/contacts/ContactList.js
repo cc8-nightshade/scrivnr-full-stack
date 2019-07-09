@@ -40,7 +40,6 @@ class ContactList extends Component {
     this.props.getUsers();
     this.props.getCallingStatus();
     this.sendUserInfoToServer();
-
   }
 
   updateState = event => {
@@ -61,6 +60,7 @@ class ContactList extends Component {
     // Initialize Socket
     const tempSocket = io.connect();
     // Initialize Socket Details
+    // Put in Block to allow collapsing in editor
     {
       tempSocket.on("message", messageData => {
         // If a bad message, puts state back into notInCall
@@ -70,16 +70,13 @@ class ContactList extends Component {
         alert(messageData);
       });
       tempSocket.on("online-users", onlineNow => {
-        // Get List From Ian
+        // stores List of online users from server 
         this.props.getOnlineUsers(onlineNow)
       });
       tempSocket.on("calling", (callingUser, callingSocket) => {
         this.props.updateCallingStatus('beingCalled')
         this.checkAcceptCall(callingUser, callingSocket);
       });
-
-
-
       tempSocket.on("rtc-offer", (callingUser, callingSocket, offerData) => {
         console.log('Changing to inCall');
         this.props.updateCallingStatus('inCall')
@@ -113,8 +110,6 @@ class ContactList extends Component {
       mySocket: tempSocket
     });
     console.log("Initialized client-side socket: ", this.state.mySocket);
-    // talk to socket server to say "I'm online"
-    // this is where get from redux
 
     this.state.mySocket.emit("initialize", this.props.auth.email);
     this.state.mySocket.emit("get-online-users");
@@ -136,48 +131,34 @@ class ContactList extends Component {
         callingSocket
       );
       this.props.updateCallingStatus('notInCall')
-
-      // TODO Destroy recorder!
     }
   }
 
   startCall = async receiverName => {
-    this.props.updateCallingStatus('calling')
+    this.props.updateCallingStatus('calling');
 
-    // const receiverName = prompt('Who do you want to call?', 'Voldemort');
-    console.log(receiverName);
     if (receiverName !== "" && receiverName !== null) {
-      console.log("Starting a call");
-      this.setState({
+      console.log(`Starting a call with ${receiverName}`);
+      await this.setState({
         receiverName
       });
-
-      
-      this.createPeerConnection();
+      await this.createPeerConnection();
       console.log("Created caller's connection", this.state.myPeerConnection);
-      
       await this.setUpOpusRecorder();
-
       console.log("Created recorder");
 
       const mediaConstraints = {
         audio: true
         // video: true
       };
-
-      navigator.mediaDevices.getUserMedia(mediaConstraints)
-        .then((localStream) => {
-          //document.getElementById("local_video").srcObject = localStream;
-          localStream.getTracks().forEach(track => this.state.myPeerConnection.addTrack(track, localStream));
-          this.state.mediaRecorder.start(localStream);
-          // this.setState({
-          //   myStream: localStream
-          // });
-
-          console.log("Tracks added to connection");
-        });
+      let localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints)
+      await localStream.getTracks().forEach(track => this.state.myPeerConnection.addTrack(track, localStream));
+      
+      this.state.mediaRecorder.start(localStream);
+      console.log("Tracks added to connection");
+        // });
     } else {
-      // If they didn't enter any name
+      // If they didn't enter any name. Unlikely, since this is now tied to clicking the call button for a known contact.
       alert("Please enter a user name");
     }
   };
@@ -205,16 +186,16 @@ class ContactList extends Component {
     if (
       !this.state.myPeerConnection.remoteDescription &&
       !this.state.myPeerConnection.localDescreption
-    ) {
-      await this.state.myPeerConnection.createOffer().then(offer => {
-        this.state.myPeerConnection.setLocalDescription(offer);
-        console.log("Offer created, sending to server:", offer);
-      });
+    )
+    {
+      let offer = await this.state.myPeerConnection.createOffer();
+      await this.state.myPeerConnection.setLocalDescription(offer);
+      console.log("Offer created, sending to server:", offer);
       this.state.mySocket.emit(
         "rtc-offer",
         this.props.auth.email,
         this.state.receiverName,
-        {
+        { 
           sdp: this.state.myPeerConnection.localDescription
         }
       );
@@ -229,83 +210,46 @@ class ContactList extends Component {
   };
 
   handleOfferMessage = async (callerName, callerSocket, offerData) => {
-    // Check to see if they accept, and only continue setting up connection if yes
     console.log("session description receiving", offerData.sdp);
 
-    // confirmation moved to different place
-    // if (window.confirm(`Would you like to accept a call from ${callerName}?`)) {
+    await this.createPeerConnection();
+    await this.state.myPeerConnection.setRemoteDescription(offerData.sdp);
+    await this.setUpOpusRecorder();
 
-
-      await this.createPeerConnection();
-      await this.state.myPeerConnection.setRemoteDescription(offerData.sdp);
-      await this.setUpOpusRecorder();
-
-      let mediaConstraints = {
-        audio: true
-        // video: true
-      };
-      await navigator.mediaDevices
-        .getUserMedia(mediaConstraints)
-        .then(localStream => {
-          document.getElementById("local_video").srcObject = localStream;
-          localStream
-            .getTracks()
-            .forEach(track =>
-              this.state.myPeerConnection.addTrack(track, localStream)
-            );
-          this.state.mediaRecorder.start(localStream);
-        });
-      await this.state.myPeerConnection.createAnswer().then(answer => {
-        this.state.myPeerConnection.setLocalDescription(answer);
-      });
-      console.log(
-        "Answer created and sending:",
-        this.state.myPeerConnection.localDescription
+    let mediaConstraints = {
+      audio: true
+      // video: true
+    };
+    let localStream = await navigator.mediaDevices
+      .getUserMedia(mediaConstraints);
+    localStream
+      .getTracks()
+      .forEach(track =>
+        this.state.myPeerConnection.addTrack(track, localStream)
       );
-      this.state.mySocket.emit("rtc-answer", callerSocket, {
-        sdp: this.state.myPeerConnection.localDescription
-      });
-    // } else {
-    //   // If the user rejects call
-    //   this.state.mySocket.emit(
-    //     "reject-call",
-    //     this.props.auth.email,
-    //     callerSocket
-    //   );
+    this.state.mediaRecorder.start(localStream);
     
-      // Confirmation logic moved elsewhere
-    // } 
-    // else { // If the user rejects call
-    //   this.state.mySocket.emit("reject-call", this.state.myName, callerSocket);
-    //   this.resetMyPeerConnection();
-    //   // TODO Destroy recorder!
-    // }
+    let answer = await this.state.myPeerConnection.createAnswer();
+    await this.state.myPeerConnection.setLocalDescription(answer);
+    
+    console.log(
+      "Answer created and sending:",
+      this.state.myPeerConnection.localDescription
+    );
+
+    this.state.mySocket.emit(
+      "rtc-answer", 
+      callerSocket, 
+      {
+        sdp: this.state.myPeerConnection.localDescription
+      }
+    );
   }
   
   handleAnswerMessage = async (answerData) => {
-    // const mediaConstraints = {audio: true, 
-    //   // // video: true
-    // };
-    // navigator.mediaDevices.getUserMedia(mediaConstraints)
-    //   .then((localStream) => {
-    //     this.state.mediaRecorder.start(localStream);
-    //     console.log("Started Recording");
-    //   });
-    
-    
-    //this.state.mySocket.emit("reset-recording");
     console.log("handling answer", answerData.sdp);
-    
-    // REALLY ONLY WANT TO START RECORDING ON ANSWER, BUT NOT WORKING???
-    // this.state.mediaRecorder.start(this.state.myStream);
-    
-    console.log("started caller's recording");
-    this.state.myPeerConnection.setRemoteDescription(answerData.sdp)
-
-      .then(() => {
-        console.log("processed answer successfully");
-      })
-      .catch(err => console.log("error handling answer", err));
+    await this.state.myPeerConnection.setRemoteDescription(answerData.sdp);
+    console.log("processed answer successfully");
   };
 
   handleICECandidateEvent = event => {
@@ -331,14 +275,13 @@ class ContactList extends Component {
     this.endCall();
   };
 
-  // Refactored out of hangUpCall because it needs to be run when the other party hangs up
+  // Run on both sides when one side hangs up
   endCall = () => {
     console.log("Shutting down call.");
-    this.props.updateCallingStatus('notInCall')
+    this.props.updateCallingStatus('notInCall');
+
     if (this.state.mediaRecorder) {
       this.state.mediaRecorder.stop();
-
-      
     }
     if(this.state.myPeerConnection.remoteDescription !== null){
       setTimeout(() => {this.state.mySocket.emit("end-recording");}, 2000);
@@ -347,7 +290,6 @@ class ContactList extends Component {
     this.setState({
       mediaRecorder: null
     });
-    // TODO - Change color of buttons etc based on call status
   };
 
   setUpOpusRecorder = async () => {
@@ -375,7 +317,6 @@ class ContactList extends Component {
     let binstr = Array.prototype.map.call(buf, function (ch) {
         return String.fromCharCode(ch);
     }).join('');
-
     return btoa(binstr);
   };
 
