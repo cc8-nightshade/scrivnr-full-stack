@@ -26,7 +26,7 @@
     "redux-firestore": "^1.0.0-alpha.2",
     "redux-thunk": "^2.3.0",
     "shortid": "^2.2.14",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.4.0",
     "sox": "^0.1.0",
     "uws": "^10.148.1"
   },
